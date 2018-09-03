@@ -1,3 +1,7 @@
+/*
+Source: https://medium.freecodecamp.org/how-to-make-create-react-app-work-with-a-node-backend-api-7c5c48acb1b0
+*/
+
 const express = require('express');
 const path = require('path');
 
@@ -13,10 +17,12 @@ app.get('/api/yelp', (req, res) => {
     const client = yelp.client(apiKey);
 
     client.search({
-      term: 'restaurants',
-      location: 'san francisco, ca'
+        term: 'restaurants',
+        location: 'san francisco, ca'
     }).then(response => {
-        res.send({ data: response.jsonBody.businesses });
+        res.send({
+            data: response.jsonBody.businesses
+        });
     }).catch(e => {
         console.log(e);
     });

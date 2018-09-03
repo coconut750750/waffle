@@ -7,7 +7,7 @@ const Header = () => (
   <div class="container-fluid">
     <div id="header" class="row justify-content-center pb-2 pt-2">
       <div class="col text-center">
-        <Link to='/' id='logo'><h3>waffle</h3></Link>
+        <Link to='/' id='logo'><h3>Waffle</h3></Link>
       </div>
     </div>
   </div>

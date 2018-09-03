@@ -15,8 +15,8 @@ function getRandom(arr, n) {
     return result;
 }
 
-function RestaurantTools() {
-    this.getPair = function (restaurants) {
+class RestaurantTools {
+    static getPair(restaurants) {
         return getRandom(restaurants, 2);
     }
 }

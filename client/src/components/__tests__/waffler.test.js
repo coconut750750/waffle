@@ -85,4 +85,16 @@ describe('Waffler', () => {
         expect(wrapper.state('ranks')[selectedId]).toBeGreaterThan(selectedRank);
         expect(wrapper.state('ranks')[otherId]).toBeLessThan(otherRank);
     });
+
+    it('removing restaurants', () => {
+        for (var i = 0; i < 2; i++) {
+            instance.getNewPair();
+        }
+
+        var toRemove = wrapper.state('pair')[0];
+        instance.removeRestaurant(toRemove);
+
+        expect(wrapper.state('visited').length).toBe(5);
+        expect(wrapper.state('ranks')[toRemove.id]).toBe(undefined);
+    });
 });

@@ -74,9 +74,7 @@ class Waffler extends React.Component {
         var pair;
         if (this.state.unvisited.length === 0) {
             var origPair = this.state.pair;
-            var tempVisited = Array.from(this.state.visited);
-            tempVisited.splice(tempVisited.indexOf(origPair[0]), 1);
-            tempVisited.splice(tempVisited.indexOf(origPair[1]), 1);
+            var tempVisited = RestaurantTools.removeFromList(Array.from(this.state.visited), origPair);
             this.setState({
                 pair: RestaurantTools.getPair(tempVisited),
             });
@@ -111,6 +109,21 @@ class Waffler extends React.Component {
             }
         }
         return newVisited
+    }
+
+    removeRestaurant(restaurant) {
+        var newUnvisited = RestaurantTools.removeFromList(Array.from(this.state.unvisited), [restaurant]);
+        var newVisited = RestaurantTools.removeFromList(Array.from(this.state.visited), [restaurant]);
+        var newRanks = Object.assign({}, this.state.ranks);
+        delete newRanks[restaurant.id];
+
+        this.setState({
+            unvisited: newUnvisited,
+            visited: newVisited,
+            ranks: newRanks,
+        });
+
+        this.getNewPair();
     }
 
     render() {

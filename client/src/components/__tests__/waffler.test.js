@@ -28,8 +28,6 @@ describe('Waffler', () => {
     });
 
     it('setting up restaurants', () => {
-        expect(wrapper.state.restaurants.length).toBe(6);
-        expect(wrapper.state('restaurants')[1].name).toBe('Potbelly');
         expect(wrapper.state('unvisited').length).toBe(4);
         expect(wrapper.state('visited').length).toBe(2);
         expect(wrapper.state('ranks')['1']).toBe(0);
@@ -49,9 +47,9 @@ describe('Waffler', () => {
 
     it('getting new ranks', () => {
         var pair = wrapper.state('pair');
-        var selectedId = wrapper.state('restaurants')[pair[0]].id;
+        var selectedId = pair[0].id;
         var selectedRankBefore = wrapper.state('ranks')[selectedId];
-        var unselectedId = wrapper.state('restaurants')[pair[1]].id;
+        var unselectedId = pair[1].id;
         var unselectedRankBefore = wrapper.state('ranks')[unselectedId];
 
         instance.getNewRanks(selectedId, unselectedId);
@@ -75,10 +73,10 @@ describe('Waffler', () => {
     it('selecting restaurants', () => {
         var origPair = wrapper.state('pair');
 
-        var selectedId = wrapper.state('restaurants')[origPair[0]].id; 
+        var selectedId = origPair[0].id; 
         var selectedRank = wrapper.state('ranks')[selectedId];
 
-        var otherId = wrapper.state('restaurants')[origPair[1]].id;
+        var otherId = origPair[1].id;
         var otherRank = wrapper.state('ranks')[otherId];
 
         instance.selectRestaurant(origPair[0]);

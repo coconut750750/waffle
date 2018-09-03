@@ -9,7 +9,6 @@ class Waffler extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            restaurants: [],
             unvisited: [],
             visited: [],
             pair: [],
@@ -19,8 +18,7 @@ class Waffler extends React.Component {
 
     setInitial(initialData) {
         this.setState({
-            restaurants: initialData,
-            unvisited: Array.apply(null, {length: initialData.length}).map(Number.call, Number),
+            unvisited: initialData,
             visited: [],
             ranks: initialData.reduce(function(map, obj) {
                         map[obj.id] = 0;
@@ -32,7 +30,6 @@ class Waffler extends React.Component {
 
     componentDidMount() {
         this.callApi().then(res => {
-            console.log(res.data);
             var restData = this.transformData(res.data);
             this.setInitial(restData);
             }).catch(err => console.log(err));
@@ -54,12 +51,10 @@ class Waffler extends React.Component {
         return reducedData;
     }
 
-    selectRestaurant(index) {
-        var otherIndex = this.state.pair[0] === index ? this.state.pair[1] : this.state.pair[0];
-        var id = this.state.restaurants[index].id;
-        var otherId = this.state.restaurants[otherIndex].id;
+    selectRestaurant(restaurant) {
+        var other = this.state.pair[0].id === restaurant.id ? this.state.pair[1] : this.state.pair[0];
         
-        this.getNewRanks(id, otherId);
+        this.getNewRanks(restaurant.id, other.id);
         this.getNewPair();
     }
 
@@ -118,10 +113,6 @@ class Waffler extends React.Component {
         return newVisited
     }
 
-    // getRank(restaurantId) {
-    //     return this.state.ranks
-    // }
-
     render() {
         console.log(this.state);
         return (
@@ -131,9 +122,8 @@ class Waffler extends React.Component {
                         this.state.pair.map(r => (
                             <div class="col-5 mb-4">
                                 <RestaurantCard 
-                                    restaurant={this.state.restaurants[r]} 
-                                    pos={r} 
-                                    onClick={(rIndex) => this.selectRestaurant(rIndex)}/>
+                                    restaurant={r} 
+                                    onClick={(restaurant) => this.selectRestaurant(restaurant)}/>
                             </div>
                         ))
                     }

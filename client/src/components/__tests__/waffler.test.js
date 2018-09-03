@@ -28,7 +28,7 @@ describe('Waffler', () => {
     });
 
     it('setting up restaurants', () => {
-        expect(wrapper.state('restaurants').length).toBe(6);
+        expect(wrapper.state.restaurants.length).toBe(6);
         expect(wrapper.state('restaurants')[1].name).toBe('Potbelly');
         expect(wrapper.state('unvisited').length).toBe(4);
         expect(wrapper.state('visited').length).toBe(2);

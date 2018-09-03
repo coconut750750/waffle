@@ -118,6 +118,10 @@ class Waffler extends React.Component {
         return newVisited
     }
 
+    // getRank(restaurantId) {
+    //     return this.state.ranks
+    // }
+
     render() {
         console.log(this.state);
         return (

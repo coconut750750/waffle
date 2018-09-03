@@ -65,10 +65,10 @@ class Waffler extends React.Component {
 
     getNewRanks(selectedId, unselectedId) {
         var newRanks = Object.assign({}, this.state.ranks);
-        var r1 = newRanks[id];
-        var r2 = newRanks[otherId];
-        newRanks[id] = RankingTools.calculateNewR(r1, 1, RankingTools.calculateP(r1, r2));
-        newRanks[otherId] = RankingTools.calculateNewR(r2, 0, RankingTools.calculateP(r2, r1));
+        var r1 = newRanks[selectedId];
+        var r2 = newRanks[unselectedId];
+        newRanks[selectedId] = RankingTools.calculateNewR(r1, 1, RankingTools.calculateP(r1, r2));
+        newRanks[unselectedId] = RankingTools.calculateNewR(r2, 0, RankingTools.calculateP(r2, r1));
 
         this.setState({
             ranks: newRanks,

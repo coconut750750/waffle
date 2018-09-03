@@ -37,6 +37,41 @@ describe('Waffler', () => {
         expect(wrapper.state('pair')[0]).not.toBe(wrapper.state('pair')[1]);
     });
 
+    it('getting first 3 pairs', () => {
+        expect(wrapper.state('unvisited').length).toBe(4);
+        expect(wrapper.state('visited').length).toBe(2);
+        for (var i = 0; i < 2; i++) {
+            instance.getNewPair();
+        }
+        expect(wrapper.state('unvisited').length).toBe(0);
+        expect(wrapper.state('visited').length).toBe(6);
+    });
+
+    it('getting new ranks', () => {
+        var pair = wrapper.state('pair');
+        var selectedId = wrapper.state('restaurants')[pair[0]].id;
+        var selectedRankBefore = wrapper.state('ranks')[selectedId];
+        var unselectedId = wrapper.state('restaurants')[pair[1]].id;
+        var unselectedRankBefore = wrapper.state('ranks')[unselectedId];
+
+        instance.getNewRanks(selectedId, unselectedId);
+        expect(wrapper.state('ranks')[selectedId]).toBeGreaterThan(selectedRankBefore);
+        expect(wrapper.state('ranks')[unselectedId]).toBeLessThan(unselectedRankBefore);
+    });
+
+    it('getting pairs after first 3', () => {
+        for (var i = 0; i < 2; i++) {
+            instance.getNewPair();
+        }
+
+        for (var i = 0; i < 10; i++) {
+            var origPair = wrapper.state('pair');
+            instance.getNewPair();
+            expect(wrapper.state('pair')[0]).not.toBe(origPair[0]);
+            expect(wrapper.state('pair')[1]).not.toBe(origPair[1]);
+        }
+    });
+
     it('selecting restaurants', () => {
         var origPair = wrapper.state('pair');
 
@@ -51,28 +86,5 @@ describe('Waffler', () => {
         expect(wrapper.state('visited').length).toBe(4);
         expect(wrapper.state('ranks')[selectedId]).toBeGreaterThan(selectedRank);
         expect(wrapper.state('ranks')[otherId]).toBeLessThan(otherRank);
-    });
-
-    it('getting first 3 pairs', () => {
-        expect(wrapper.state('unvisited').length).toBe(4);
-        expect(wrapper.state('visited').length).toBe(2);
-        for (var i = 0; i < 2; i++) {
-            instance.getNewPair();
-        }
-        expect(wrapper.state('unvisited').length).toBe(0);
-        expect(wrapper.state('visited').length).toBe(6);
-    });
-
-    it('getting pairs after first 3', () => {
-        for (var i = 0; i < 2; i++) {
-            instance.getNewPair();
-        }
-
-        for (var i = 0; i < 10; i++) {
-            var origPair = wrapper.state('pair');
-            instance.getNewPair();
-            expect(wrapper.state('pair')[0]).not.toBe(origPair[0]);
-            expect(wrapper.state('pair')[1]).not.toBe(origPair[1]);
-        }
     });
 });

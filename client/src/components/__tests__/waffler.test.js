@@ -59,6 +59,5 @@ describe('Waffler', () => {
             expect(wrapper.state('pair')[0]).not.toBe(origPair[0]);
             expect(wrapper.state('pair')[1]).not.toBe(origPair[1]);
         }
-
     });
 });

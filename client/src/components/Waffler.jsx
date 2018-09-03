@@ -41,9 +41,7 @@ class Waffler extends React.Component {
     async callApi() {
         const response = await fetch('/api/yelp');
         const body = await response.json();
-
         if (response.status !== 200) throw Error(body.message);
-
         return body;
     };
 
@@ -58,20 +56,23 @@ class Waffler extends React.Component {
 
     selectRestaurant(index) {
         var otherIndex = this.state.pair[0] === index ? this.state.pair[1] : this.state.pair[0];
-        var restaurant = this.state.restaurants[index];
-        var otherRest = this.state.restaurants[otherIndex];
-        var newRanks = Object.assign({}, this.state.ranks);
+        var id = this.state.restaurants[index].id;
+        var otherId = this.state.restaurants[otherIndex].id;
         
-        var r1 = newRanks[restaurant.id];
-        var r2 = newRanks[otherRest.id];
-        newRanks[restaurant.id] = RankingTools.calculateNewR(r1, 1, RankingTools.calculateP(r1, r2));
-        newRanks[otherRest.id] = RankingTools.calculateNewR(r2, 0, RankingTools.calculateP(r2, r1));
+        this.getNewRanks(id, otherId);
+        this.getNewPair();
+    }
+
+    getNewRanks(selectedId, unselectedId) {
+        var newRanks = Object.assign({}, this.state.ranks);
+        var r1 = newRanks[id];
+        var r2 = newRanks[otherId];
+        newRanks[id] = RankingTools.calculateNewR(r1, 1, RankingTools.calculateP(r1, r2));
+        newRanks[otherId] = RankingTools.calculateNewR(r2, 0, RankingTools.calculateP(r2, r1));
 
         this.setState({
-            restaurants: this.state.restaurants,
             ranks: newRanks,
         });
-        this.getNewPair();
     }
 
     getNewPair() {
@@ -81,7 +82,10 @@ class Waffler extends React.Component {
             var tempVisited = Array.from(this.state.visited);
             tempVisited.splice(tempVisited.indexOf(origPair[0]), 1);
             tempVisited.splice(tempVisited.indexOf(origPair[1]), 1);
-            pair = RestaurantTools.getPair(tempVisited);
+            this.setState({
+                pair: RestaurantTools.getPair(tempVisited),
+            });
+            return;
         } else if (this.state.unvisited.length === 1) {
             pair = [this.state.unvisited[0], RestaurantTools.getRandom(this.state.visited)];
         } else {

@@ -77,10 +77,13 @@ class Waffler extends React.Component {
     getNewPair() {
         var pair;
         if (this.state.unvisited.length === 0) {
-            pair = RestaurantTools.getPair(this.state.visited);
+            var origPair = this.state.pair;
+            var tempVisited = Array.from(this.state.visited);
+            tempVisited.splice(tempVisited.indexOf(origPair[0]), 1);
+            tempVisited.splice(tempVisited.indexOf(origPair[1]), 1);
+            pair = RestaurantTools.getPair(tempVisited);
         } else if (this.state.unvisited.length === 1) {
-            pair = [this.state.unvisited[0]];
-            pair.push(RestaurantTools.getRandom(this.state.visited));
+            pair = [this.state.unvisited[0], RestaurantTools.getRandom(this.state.visited)];
         } else {
             pair = RestaurantTools.getPair(this.state.unvisited);
         }

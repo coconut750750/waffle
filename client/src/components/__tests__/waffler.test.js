@@ -51,4 +51,14 @@ describe('Waffler', () => {
         expect(wrapper.state('ranks')[selectedId]).toBeGreaterThan(selectedRank);
         expect(wrapper.state('ranks')[otherId]).toBeLessThan(otherRank);
     });
+
+    it('getting new pair', () => {
+        for (var i = 0; i < 10; i++) {
+            var origPair = wrapper.state('pair');
+            instance.getNewPair();
+            expect(wrapper.state('pair')[0]).not.toBe(origPair[0]);
+            expect(wrapper.state('pair')[1]).not.toBe(origPair[1]);
+        }
+
+    });
 });

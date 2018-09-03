@@ -12,7 +12,8 @@ const port = process.env.PORT || 5000;
 app.get('/api/yelp', (req, res) => {
     const yelp = require('yelp-fusion');
 
-    const apiKey = '55B_Ulkdii0YvoCRKYMYzEHWU5VEGGFEKvJ02-vURxsPQvsjnekcFtmdZ-ojz9lP7bROf2xkcKyZlh9tvN55SwavlzVPiDsP1VQlVTWnK48XZtAcBdGpXBlnzQSMW3Yx';
+    const apiKey = process.env.YELP_APIKEY;
+    console.log(apiKey);
 
     const client = yelp.client(apiKey);
 

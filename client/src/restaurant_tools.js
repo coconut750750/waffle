@@ -19,6 +19,10 @@ class RestaurantTools {
     static getPair(restaurants) {
         return getRandom(restaurants, 2);
     }
+
+    static getRandom(restaurants) {
+        return getRandom(restaurants, 1);
+    }
 }
 
 export default RestaurantTools

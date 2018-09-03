@@ -1,6 +1,6 @@
 import React from 'react';
 
-import Restaurant from '../restaurant'
+import Restaurant from '../restaurant.js'
 import RestaurantCard from './RestaurantCard.jsx'
 import RestaurantTools from '../restaurant_tools.js'
 

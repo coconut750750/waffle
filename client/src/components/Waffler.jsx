@@ -24,8 +24,9 @@ class Waffler extends React.Component {
                         map[obj.id] = 0;
                         return map;
                     }, {}),
+        }, function() {
+            this.getNewPair();
         });
-        this.getNewPair();
     }
 
     componentDidMount() {
@@ -51,7 +52,7 @@ class Waffler extends React.Component {
         return reducedData;
     }
 
-    selectRestaurant(restaurant) {
+    selectRestaurant(e, restaurant) {
         var other = this.state.pair[0].id === restaurant.id ? this.state.pair[1] : this.state.pair[0];
         
         this.getNewRanks(restaurant.id, other.id);
@@ -111,9 +112,11 @@ class Waffler extends React.Component {
         return newVisited
     }
 
-    removeRestaurant(restaurant) {
+    removeRestaurant(e, restaurant) {
+        e.stopPropagation();
         var newUnvisited = RestaurantTools.removeFromList(Array.from(this.state.unvisited), [restaurant]);
         var newVisited = RestaurantTools.removeFromList(Array.from(this.state.visited), [restaurant]);
+
         var newRanks = Object.assign({}, this.state.ranks);
         delete newRanks[restaurant.id];
 
@@ -121,9 +124,9 @@ class Waffler extends React.Component {
             unvisited: newUnvisited,
             visited: newVisited,
             ranks: newRanks,
+        }, function() {
+            this.getNewPair();
         });
-
-        this.getNewPair();
     }
 
     render() {
@@ -136,7 +139,8 @@ class Waffler extends React.Component {
                             <div class="col-5 mb-4">
                                 <RestaurantCard 
                                     restaurant={r} 
-                                    onClick={(restaurant) => this.selectRestaurant(restaurant)}/>
+                                    onClick={(e, restaurant) => this.selectRestaurant(e, restaurant)}
+                                    onRemove={(e, restaurant) => this.removeRestaurant(e, restaurant)}/>
                             </div>
                         ))
                     }

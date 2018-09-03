@@ -28,16 +28,27 @@ describe('Waffler', () => {
 
     it('setting up restaurants', () => {
         expect(wrapper.state('restaurants')[1].name).toBe('Potbelly');
-        expect(wrapper.state('scores')['1']).toBe(0);
+        expect(wrapper.state('ranks')['1']).toBe(0);
         expect(wrapper.state('pair').length).toBe(2);
         expect(wrapper.state('pair')[0]).not.toBe(wrapper.state('pair')[1]);
     });
 
     it('selecting restaurants', () => {
         var origPair = wrapper.state('pair');
-        instance.selectRestaurant(restaurants[3]);
-        expect(wrapper.state('scores')['3']).toBe(1);
-        expect(wrapper.state('pair')[0].id).not.toBe(origPair[0].id);
-        expect(wrapper.state('pair')[1].id).not.toBe(origPair[1].id);
+        var selectedId = origPair[0].id; 
+        var selectedRank = wrapper.state('ranks')[selectedId];
+        var otherId = origPair[1].id;
+        var otherRank = wrapper.state('ranks')[otherId];
+        instance.selectRestaurant(origPair[0]);
+        expect(wrapper.state('ranks')[selectedId]).toBeGreaterThan(selectedRank);
+        expect(wrapper.state('ranks')[otherId]).toBeLessThan(otherRank);
+    });
+
+    it('removing restaurants', () => {
+        var removed = restaurants[3];
+        instance.removeRestaurant(restaurants[3]);
+        expect(wrapper.state('restaurants').length).toBe(4);
+        expect(wrapper.state('restaurants')[3].id).not.toBe(removed.id);
+        expect(wrapper.state('ranks')['3']).toBe(undefined);
     });
 });

@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom'
 
 const Header = () => (
   <div class="container-fluid">
-    <div id="header" class="row justify-content-center pb-2 pt-2">
+    <div id="header" class="row justify-content-center mb-4 h-100">
       <div class="col text-center">
         <Link to='/' id='logo'><h3>Waffle</h3></Link>
       </div>

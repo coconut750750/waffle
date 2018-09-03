@@ -3,6 +3,7 @@ import React from 'react';
 import Restaurant from '../restaurant.js'
 import RestaurantCard from './RestaurantCard.jsx'
 import RestaurantTools from '../restaurant_tools.js'
+import RankingTools from '../ranking_tools.js'
 
 class Waffler extends React.Component {
     constructor(props) {
@@ -10,7 +11,7 @@ class Waffler extends React.Component {
         this.state = {
             restaurants: [],
             pair: [],
-            scores: {},
+            ranks: {},
         };
     }
 
@@ -18,7 +19,7 @@ class Waffler extends React.Component {
         this.setState({
             restaurants: initialData,
             pair: RestaurantTools.getPair(initialData),
-            scores: initialData.reduce(function(map, obj) {
+            ranks: initialData.reduce(function(map, obj) {
                         map[obj.id] = 0;
                         return map;
                     }, {}),
@@ -52,12 +53,21 @@ class Waffler extends React.Component {
     }
 
     selectRestaurant(restaurant) {
-        var newScores = Object.assign({}, this.state.scores);
-        newScores[restaurant.id] += 1;
+        var otherRest = this.state.pair[0].id != restaurant.id ? this.state.pair[0] : this.state.pair[1];
+        var newRanks = Object.assign({}, this.state.ranks);
+
+        var r1 = newRanks[restaurant.id];
+        var r2 = newRanks[otherRest.id];
+        var r1 = RankingTools.calculateNewR(r1, 1, RankingTools.calculateP(r1, r2));
+        var r2 = RankingTools.calculateNewR(r2, 0, RankingTools.calculateP(r2, r1));
+
+        newRanks[restaurant.id] = r1;
+        newRanks[otherRest.id] = r2
+
         this.setState({
             restaurants: this.state.restaurants,
             pair: RestaurantTools.getPair(this.state.restaurants),
-            scores: newScores,
+            ranks: newRanks,
         });
     }
 
@@ -66,13 +76,13 @@ class Waffler extends React.Component {
         var index = newRestaurants.indexOf(restaurant);
         newRestaurants.splice(index, 1);
 
-        var newScores = Object.assign({}, this.state.scores);
-        delete newScores[restaurant.id];
+        var newRanks = Object.assign({}, this.state.ranks);
+        delete newRanks[restaurant.id];
 
         this.setState({
             restaurants: newRestaurants,
             pair: RestaurantTools.getPair(newRestaurants),
-            scores: newScores,
+            ranks: newRanks,
         });
     }
 

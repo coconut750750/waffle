@@ -1,4 +1,4 @@
-import RestaurantTools from '../../restaurant_tools'
+import RestaurantTools from '../../restaurant_tools.js'
 
 describe('RestaurantTools', () => {
   it('get random pair', () => {

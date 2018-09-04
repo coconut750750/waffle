@@ -10,7 +10,7 @@ class RankingTools {
     }
 
     static rankIsTooLow(r) {
-        return r <= MIN_THRESHOLD;
+        return r < MIN_THRESHOLD;
     }
 }
 

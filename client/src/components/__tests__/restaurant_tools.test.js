@@ -25,14 +25,14 @@ describe('RestaurantTools', () => {
 
     it('remove restaurant', () => {
         var toRemove = restaurants[0];
-        RestaurantTools.removeFromList(restaurants, [toRemove]);
-        expect(restaurants.indexOf(toRemove)).toBe(-1);
+        var newRests = RestaurantTools.removeFromList(restaurants, [toRemove]);
+        expect(newRests.indexOf(toRemove)).toBe(-1);
     });
 
     it('remove restaurant id', () => {
         var toRemoveId = restaurants[0].id;
-        RestaurantTools.removeIdsFromList(restaurants, [toRemoveId]);
-        expect(restaurants[0].id).not.toBe(toRemoveId);
+        var newRests = RestaurantTools.removeIdsFromList(restaurants, [toRemoveId]);
+        expect(newRests[0].id).not.toBe(toRemoveId);
     });
 
     it('get restaurant by id', () => {

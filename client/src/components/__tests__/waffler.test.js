@@ -7,9 +7,9 @@ import Restaurant from '../../restaurant.js'
 
 configure({adapter: new Adapter()});
 
-function visitAll(instance) {
-    for (var i = 0; i < 2; i++) {
-        instance.setNewPair(instance.getNewPair());
+function visitN(instance, totalPairs) {
+    for (var i = 0; i < totalPairs - 1; i++) {
+        instance.updatePair();
     }
 }
 
@@ -44,7 +44,7 @@ describe('Waffler', () => {
     it('getting first 3 pairs', () => {
         expect(wrapper.state('unvisited').length).toBe(4);
         expect(wrapper.state('visited').length).toBe(2);
-        visitAll(instance);
+        visitN(instance, 3);
         expect(wrapper.state('unvisited').length).toBe(0);
         expect(wrapper.state('visited').length).toBe(6);
     });
@@ -62,14 +62,14 @@ describe('Waffler', () => {
     });
 
     it('getting pairs after first 3', () => {
-        visitAll(instance);
+        visitN(instance, 3);
 
-        for (var i = 0; i < 10; i++) {
-            var origPair = wrapper.state('pair');
-            instance.setNewPair(instance.getNewPair());
-            expect(wrapper.state('pair')[0]).not.toBe(origPair[0]);
-            expect(wrapper.state('pair')[1]).not.toBe(origPair[1]);
-        }
+        var origPair = wrapper.state('pair');
+        instance.updatePair();
+        expect(wrapper.state('visited').length).toBe(2);
+        expect(wrapper.state('unvisited').length).toBe(4);
+        expect(wrapper.state('pair')[0]).not.toBe(origPair[0]);
+        expect(wrapper.state('pair')[1]).not.toBe(origPair[1]);
     });
 
     it('selecting restaurants', () => {
@@ -97,7 +97,7 @@ describe('Waffler', () => {
     });
 
     it('removing restaurants after all visited', () => {
-        visitAll(instance);
+        visitN(instance, 3);
 
         var toRemove = wrapper.state('pair')[0];
         instance.removeRestaurant(toRemove);

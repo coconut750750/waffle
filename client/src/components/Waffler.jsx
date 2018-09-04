@@ -26,7 +26,7 @@ class Waffler extends React.Component {
                         return map;
                     }, {}),
         });
-        this.setNewPair(this.getNewPair());
+        this.updatePair();
     }
 
     componentDidMount() {
@@ -54,7 +54,7 @@ class Waffler extends React.Component {
 
     handleSelect(e, restaurant) {
         var other = this.selectRestaurant(restaurant);
-        this.setNewPair(this.getNewPair());
+        this.updatePair();
         this.checkRestaurantRank(other);
     }
 
@@ -74,56 +74,53 @@ class Waffler extends React.Component {
         this.setState({ranks: newRanks});
     }
 
-    getNewPair() {
-        if (this.state.unvisited.length === 0) {
-            var origPair = this.state.pair;
-            var tempVisited = Array.from(this.state.visited);
-            if (this.state.visited.length > 4) {
-                tempVisited = RestaurantTools.removeFromList(tempVisited, origPair);
-            }
-            return RestaurantTools.getPair(tempVisited);
-        } else if (this.state.unvisited.length === 1) {
-            return [this.state.unvisited[0], RestaurantTools.getRandom(this.state.visited)];
-        } else {
-            return RestaurantTools.getPair(this.state.unvisited);
-        }
-    }
-
-    setNewPair(pair) {
+    updatePair() {
         this.setState((prevState) => {
+            var pair, prevUnvisited, prevVisited;
+            if (prevState.unvisited.length === 0) {
+                prevUnvisited = Array.from(prevState.visited);
+                prevVisited = [];
+                pair = RestaurantTools.getPair(RestaurantTools.removeFromList(prevUnvisited, prevState.pair));
+            } else {
+                if (prevState.unvisited.length === 1) {
+                    pair = [prevState.unvisited[0], RestaurantTools.getRandom(prevState.visited)];
+                } else {
+                    pair = RestaurantTools.getPair(prevState.unvisited);
+                }
+                prevUnvisited = prevState.unvisited;
+                prevVisited = prevState.visited;
+            }
+            
             return {
                 pair: pair,
-                unvisited: this.getNewUnvisited(prevState, pair),
-                visited: this.getNewVisited(prevState, pair),
+                unvisited: this.getNewUnvisited(prevUnvisited, pair),
+                visited: this.getNewVisited(prevVisited, pair),
             }
         });
     }
 
-    getNewUnvisited(state, visitedList) {
-        var newUnvisited = Array.from(state.unvisited);
-        for (var i = newUnvisited.length - 1; i >= 0; i--) {
-            if (visitedList.indexOf(newUnvisited[i]) !== -1) {
-                newUnvisited.splice(i, 1);
+    getNewUnvisited(unvisited, pair) {
+        for (var i = unvisited.length - 1; i >= 0; i--) {
+            if (pair.indexOf(unvisited[i]) !== -1) {
+                unvisited.splice(i, 1);
             }
         }
-        return newUnvisited;
+        return Array.from(unvisited);
     }
 
-    getNewVisited(state, visitedList) {
-        var newVisited = Array.from(state.visited);
-        for (var i = visitedList.length - 1; i >= 0; i--) {
-            if (newVisited.indexOf(visitedList[i]) === -1) {
-                newVisited.push(visitedList[i]);
+    getNewVisited(visited, pair) {
+        for (var i = pair.length - 1; i >= 0; i--) {
+            if (visited.indexOf(pair[i]) === -1) {
+                visited.push(pair[i]);
             }
         }
-        return newVisited
+        return Array.from(visited);
     }
 
     handleRemove(e, restaurant) {
         e.stopPropagation();
         this.removeRestaurant(restaurant);
-        var pair = this.getNewPair();
-        this.setNewPair(pair);
+        this.updatePair();
     }
 
     removeRestaurant(restaurant) {

@@ -17,6 +17,7 @@ function getRandom(arr, n) {
 
 class RestaurantTools {
     static removeFromList(list, restaurantsToRemove) {
+        list = Array.from(list);
         for (var i = restaurantsToRemove.length - 1; i >= 0; i--) {
             var index = list.indexOf(restaurantsToRemove[i]);
             if (index > -1) {
@@ -36,6 +37,7 @@ class RestaurantTools {
     }
 
     static removeIdsFromList(list, idsToRemove) {
+        list = Array.from(list);
         for (var i = list.length - 1; i >= 0; i--) {
             var index = idsToRemove.indexOf(list[i].id);
             if (index > -1) {
@@ -50,7 +52,7 @@ class RestaurantTools {
     }
 
     static getRandom(restaurants) {
-        return getRandom(restaurants, 1);
+        return getRandom(restaurants, 1)[0];
     }
 }
 

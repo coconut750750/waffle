@@ -26,7 +26,7 @@ class Waffler extends React.Component {
                         return map;
                     }, {}),
         }, function() {
-            this.getNewPair();
+            this.setNewPair(this.getNewPair());
         });
     }
 
@@ -53,43 +53,50 @@ class Waffler extends React.Component {
         return reducedData;
     }
 
+    handleSelect(e, restaurant) {
+        var other = this.selectRestaurant(restaurant);
+        this.setNewPair(this.getNewPair(), function() {
+            this.checkRestaurantRank(other);
+        });
+    }
+
     selectRestaurant(restaurant) {
         var other = this.state.pair[0].id === restaurant.id ? this.state.pair[1] : this.state.pair[0];
-        this.getNewRanks(restaurant.id, other.id);
+        this.getNewRanks(restaurant, other);
+        return other;
     }
 
-    handleSelect(e, restaurant) {
-        this.selectRestaurant(restaurant);
-        this.getNewPair();
-    }
-
-    getNewRanks(selectedId, unselectedId) {
+    getNewRanks(selected, unselected) {
         var newRanks = Object.assign({}, this.state.ranks);
-        var r1 = newRanks[selectedId];
-        var r2 = newRanks[unselectedId];
-        newRanks[selectedId] = RankingTools.calculateNewR(r1, 1, RankingTools.calculateP(r1, r2));
-        newRanks[unselectedId] = RankingTools.calculateNewR(r2, 0, RankingTools.calculateP(r2, r1));
+        var r1 = newRanks[selected.id];
+        var r2 = newRanks[unselected.id];
+        newRanks[selected.id] = RankingTools.calculateNewR(r1, 1, RankingTools.calculateP(r1, r2));
+        newRanks[unselected.id] = RankingTools.calculateNewR(r2, 0, RankingTools.calculateP(r2, r1));
 
         this.setState({ranks: newRanks});
     }
 
     getNewPair() {
-        var pair;
         if (this.state.unvisited.length === 0) {
             var origPair = this.state.pair;
-            var tempVisited = RestaurantTools.removeFromList(Array.from(this.state.visited), origPair);
-            this.setState({pair: RestaurantTools.getPair(tempVisited)});
-            return;
+            var tempVisited = Array.from(this.state.visited);
+            if (this.state.visited.length > 4) {
+                tempVisited = RestaurantTools.removeFromList(tempVisited, origPair);
+            }
+            return RestaurantTools.getPair(tempVisited);
         } else if (this.state.unvisited.length === 1) {
-            pair = [this.state.unvisited[0], RestaurantTools.getRandom(this.state.visited)];
+            return [this.state.unvisited[0], RestaurantTools.getRandom(this.state.visited)];
         } else {
-            pair = RestaurantTools.getPair(this.state.unvisited);
+            return RestaurantTools.getPair(this.state.unvisited);
         }
+    }
+
+    setNewPair(pair, afterSetState) {
         this.setState({
             pair: pair,
             unvisited: this.getNewUnvisited(pair),
             visited: this.getNewVisited(pair),
-        });
+        }, afterSetState);
     }
 
     getNewUnvisited(visitedList) {
@@ -112,6 +119,14 @@ class Waffler extends React.Component {
         return newVisited
     }
 
+    handleRemove(e, restaurant) {
+        e.stopPropagation();
+        this.removeRestaurant(restaurant, function() {
+            var pair = this.getNewPair();
+            this.setNewPair(pair);
+        });
+    }
+
     removeRestaurant(restaurant, afterSetState) {
         var newUnvisited = RestaurantTools.removeFromList(Array.from(this.state.unvisited), [restaurant]);
         var newVisited = RestaurantTools.removeFromList(Array.from(this.state.visited), [restaurant]);
@@ -132,11 +147,13 @@ class Waffler extends React.Component {
         }, afterSetState);
     }
 
-    handleRemove(e, restaurant) {
-        e.stopPropagation();
-        this.removeRestaurant(restaurant, function() {
-            this.getNewPair();
-        });
+    checkRestaurantRank(restaurant) {
+        if (RankingTools.rankIsTooLow(this.state.ranks[restaurant.id])) {
+            this.removeRestaurant(restaurant);
+        }
+    }
+
+    checkComplete() {
     }
 
     render() {

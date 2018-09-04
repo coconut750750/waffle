@@ -26,6 +26,25 @@ class RestaurantTools {
         return list;
     }
 
+    static getRestaurantById(list, id) {
+        for (var i = list.length - 1; i >= 0; i--) {
+            if (list[i].id === id) {
+                return list[i];
+            }
+        }
+        return undefined;
+    }
+
+    static removeIdsFromList(list, idsToRemove) {
+        for (var i = list.length - 1; i >= 0; i--) {
+            var index = idsToRemove.indexOf(list[i].id);
+            if (index > -1) {
+                list.splice(i, 1);
+            }
+        }
+        return list;
+    }
+
     static getPair(restaurants) {
         return getRandom(restaurants, 2);
     }

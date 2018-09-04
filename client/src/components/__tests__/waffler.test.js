@@ -7,6 +7,12 @@ import Restaurant from '../../restaurant.js'
 
 configure({adapter: new Adapter()});
 
+function visitAll(instance) {
+    for (var i = 0; i < 2; i++) {
+        instance.setNewPair(instance.getNewPair());
+    }
+}
+
 describe('Waffler', () => {
     let restaurants;
     let wrapper;
@@ -38,33 +44,29 @@ describe('Waffler', () => {
     it('getting first 3 pairs', () => {
         expect(wrapper.state('unvisited').length).toBe(4);
         expect(wrapper.state('visited').length).toBe(2);
-        for (var i = 0; i < 2; i++) {
-            instance.getNewPair();
-        }
+        visitAll(instance);
         expect(wrapper.state('unvisited').length).toBe(0);
         expect(wrapper.state('visited').length).toBe(6);
     });
 
     it('getting new ranks', () => {
         var pair = wrapper.state('pair');
-        var selectedId = pair[0].id;
-        var selectedRankBefore = wrapper.state('ranks')[selectedId];
-        var unselectedId = pair[1].id;
-        var unselectedRankBefore = wrapper.state('ranks')[unselectedId];
+        var selected = pair[0];
+        var selectedRankBefore = wrapper.state('ranks')[selected.id];
+        var unselected = pair[1];
+        var unselectedRankBefore = wrapper.state('ranks')[unselected.id];
 
-        instance.getNewRanks(selectedId, unselectedId);
-        expect(wrapper.state('ranks')[selectedId]).toBeGreaterThan(selectedRankBefore);
-        expect(wrapper.state('ranks')[unselectedId]).toBeLessThan(unselectedRankBefore);
+        instance.getNewRanks(selected, unselected);
+        expect(wrapper.state('ranks')[selected.id]).toBeGreaterThan(selectedRankBefore);
+        expect(wrapper.state('ranks')[unselected.id]).toBeLessThan(unselectedRankBefore);
     });
 
     it('getting pairs after first 3', () => {
-        for (var i = 0; i < 2; i++) {
-            instance.getNewPair();
-        }
+        visitAll(instance);
 
         for (var i = 0; i < 10; i++) {
             var origPair = wrapper.state('pair');
-            instance.getNewPair();
+            instance.setNewPair(instance.getNewPair());
             expect(wrapper.state('pair')[0]).not.toBe(origPair[0]);
             expect(wrapper.state('pair')[1]).not.toBe(origPair[1]);
         }
@@ -95,9 +97,7 @@ describe('Waffler', () => {
     });
 
     it('removing restaurants after all visited', () => {
-        for (var i = 0; i < 2; i++) {
-            instance.getNewPair();
-        }
+        visitAll(instance);
 
         var toRemove = wrapper.state('pair')[0];
         instance.removeRestaurant(toRemove);

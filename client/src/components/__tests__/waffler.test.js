@@ -80,8 +80,8 @@ describe('Waffler', () => {
         var otherRank = wrapper.state('ranks')[otherId];
 
         instance.selectRestaurant(origPair[0]);
-        expect(wrapper.state('unvisited').length).toBe(2);
-        expect(wrapper.state('visited').length).toBe(4);
+        expect(wrapper.state('unvisited').length).toBe(4);
+        expect(wrapper.state('visited').length).toBe(2);
         expect(wrapper.state('ranks')[selectedId]).toBeGreaterThan(selectedRank);
         expect(wrapper.state('ranks')[otherId]).toBeLessThan(otherRank);
     });
@@ -90,7 +90,7 @@ describe('Waffler', () => {
         var toRemove = wrapper.state('pair')[0];
         instance.removeRestaurant(toRemove);
 
-        expect(wrapper.state('visited').length).toBe(3);
+        expect(wrapper.state('visited').length).toBe(1);
         expect(wrapper.state('ranks')[toRemove.id]).toBe(undefined);
     });
 
@@ -102,7 +102,16 @@ describe('Waffler', () => {
         var toRemove = wrapper.state('pair')[0];
         instance.removeRestaurant(toRemove);
 
+        expect(wrapper.state('removed')[0].id).toBe(toRemove.id);
         expect(wrapper.state('visited').length).toBe(5);
         expect(wrapper.state('ranks')[toRemove.id]).toBe(undefined);
+    });
+
+    it('removing restaurants multiple times', () => {
+        var toRemove = wrapper.state('pair')[0];
+        instance.removeRestaurant(toRemove);
+        instance.removeRestaurant(toRemove);
+        instance.removeRestaurant(toRemove);
+        expect(wrapper.state('removed').length).toBe(1);
     });
 });

@@ -4,7 +4,7 @@ class RankingTools {
     }
 
     static calculateNewR(r, actual, expected) {
-        return r + 30 * (actual - expected);
+        return Math.round(r + 30 * (actual - expected));
     }
 }
 

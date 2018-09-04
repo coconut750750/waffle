@@ -11,6 +11,7 @@ class Waffler extends React.Component {
         this.state = {
             unvisited: [],
             visited: [],
+            removed: [],
             pair: [],
             ranks: {},
         };
@@ -52,10 +53,13 @@ class Waffler extends React.Component {
         return reducedData;
     }
 
-    selectRestaurant(e, restaurant) {
+    selectRestaurant(restaurant) {
         var other = this.state.pair[0].id === restaurant.id ? this.state.pair[1] : this.state.pair[0];
-        
         this.getNewRanks(restaurant.id, other.id);
+    }
+
+    handleSelect(e, restaurant) {
+        this.selectRestaurant(restaurant);
         this.getNewPair();
     }
 
@@ -66,9 +70,7 @@ class Waffler extends React.Component {
         newRanks[selectedId] = RankingTools.calculateNewR(r1, 1, RankingTools.calculateP(r1, r2));
         newRanks[unselectedId] = RankingTools.calculateNewR(r2, 0, RankingTools.calculateP(r2, r1));
 
-        this.setState({
-            ranks: newRanks,
-        });
+        this.setState({ranks: newRanks});
     }
 
     getNewPair() {
@@ -76,9 +78,7 @@ class Waffler extends React.Component {
         if (this.state.unvisited.length === 0) {
             var origPair = this.state.pair;
             var tempVisited = RestaurantTools.removeFromList(Array.from(this.state.visited), origPair);
-            this.setState({
-                pair: RestaurantTools.getPair(tempVisited),
-            });
+            this.setState({pair: RestaurantTools.getPair(tempVisited)});
             return;
         } else if (this.state.unvisited.length === 1) {
             pair = [this.state.unvisited[0], RestaurantTools.getRandom(this.state.visited)];
@@ -112,19 +112,29 @@ class Waffler extends React.Component {
         return newVisited
     }
 
-    removeRestaurant(e, restaurant) {
-        e.stopPropagation();
+    removeRestaurant(restaurant, afterSetState) {
         var newUnvisited = RestaurantTools.removeFromList(Array.from(this.state.unvisited), [restaurant]);
         var newVisited = RestaurantTools.removeFromList(Array.from(this.state.visited), [restaurant]);
 
         var newRanks = Object.assign({}, this.state.ranks);
         delete newRanks[restaurant.id];
 
+        var newRemoved = Array.from(this.state.removed);
+        if (newRemoved.indexOf(restaurant) === -1) {
+            newRemoved.push(restaurant);
+        }
+
         this.setState({
             unvisited: newUnvisited,
             visited: newVisited,
+            removed: newRemoved,
             ranks: newRanks,
-        }, function() {
+        }, afterSetState);
+    }
+
+    handleRemove(e, restaurant) {
+        e.stopPropagation();
+        this.removeRestaurant(restaurant, function() {
             this.getNewPair();
         });
     }
@@ -139,8 +149,8 @@ class Waffler extends React.Component {
                             <div class="col-5 mb-4">
                                 <RestaurantCard 
                                     restaurant={r} 
-                                    onClick={(e, restaurant) => this.selectRestaurant(e, restaurant)}
-                                    onRemove={(e, restaurant) => this.removeRestaurant(e, restaurant)}/>
+                                    onClick={(e, restaurant) => this.handleSelect(e, restaurant)}
+                                    onRemove={(e, restaurant) => this.handleRemove(e, restaurant)}/>
                             </div>
                         ))
                     }

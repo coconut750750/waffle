@@ -16,6 +16,16 @@ function getRandom(arr, n) {
 }
 
 class RestaurantTools {
+    static addToList(list, restaurantsToAdd) {
+        list = Array.from(list);
+        for (var i = restaurantsToAdd.length - 1; i >= 0; i--) {
+            if (list.indexOf(restaurantsToAdd[i]) === -1) {
+                list.push(restaurantsToAdd[i]);
+            }
+        }
+        return list;
+    }
+
     static removeFromList(list, restaurantsToRemove) {
         list = Array.from(list);
         for (var i = restaurantsToRemove.length - 1; i >= 0; i--) {

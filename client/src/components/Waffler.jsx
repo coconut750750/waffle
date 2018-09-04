@@ -25,9 +25,8 @@ class Waffler extends React.Component {
                         map[obj.id] = 0;
                         return map;
                     }, {}),
-        }, function() {
-            this.setNewPair(this.getNewPair());
         });
+        this.setNewPair(this.getNewPair());
     }
 
     componentDidMount() {
@@ -55,9 +54,8 @@ class Waffler extends React.Component {
 
     handleSelect(e, restaurant) {
         var other = this.selectRestaurant(restaurant);
-        this.setNewPair(this.getNewPair(), function() {
-            this.checkRestaurantRank(other);
-        });
+        this.setNewPair(this.getNewPair());
+        this.checkRestaurantRank(other);
     }
 
     selectRestaurant(restaurant) {
@@ -91,16 +89,18 @@ class Waffler extends React.Component {
         }
     }
 
-    setNewPair(pair, afterSetState) {
-        this.setState({
-            pair: pair,
-            unvisited: this.getNewUnvisited(pair),
-            visited: this.getNewVisited(pair),
-        }, afterSetState);
+    setNewPair(pair) {
+        this.setState((prevState) => {
+            return {
+                pair: pair,
+                unvisited: this.getNewUnvisited(prevState, pair),
+                visited: this.getNewVisited(prevState, pair),
+            }
+        });
     }
 
-    getNewUnvisited(visitedList) {
-        var newUnvisited = Array.from(this.state.unvisited);
+    getNewUnvisited(state, visitedList) {
+        var newUnvisited = Array.from(state.unvisited);
         for (var i = newUnvisited.length - 1; i >= 0; i--) {
             if (visitedList.indexOf(newUnvisited[i]) !== -1) {
                 newUnvisited.splice(i, 1);
@@ -109,8 +109,8 @@ class Waffler extends React.Component {
         return newUnvisited;
     }
 
-    getNewVisited(visitedList) {
-        var newVisited = Array.from(this.state.visited);
+    getNewVisited(state, visitedList) {
+        var newVisited = Array.from(state.visited);
         for (var i = visitedList.length - 1; i >= 0; i--) {
             if (newVisited.indexOf(visitedList[i]) === -1) {
                 newVisited.push(visitedList[i]);
@@ -121,36 +121,40 @@ class Waffler extends React.Component {
 
     handleRemove(e, restaurant) {
         e.stopPropagation();
-        this.removeRestaurant(restaurant, function() {
-            var pair = this.getNewPair();
-            this.setNewPair(pair);
+        this.removeRestaurant(restaurant);
+        var pair = this.getNewPair();
+        this.setNewPair(pair);
+    }
+
+    removeRestaurant(restaurant) {
+        this.setState((prevState) => {
+            var newUnvisited = RestaurantTools.removeFromList(Array.from(prevState.unvisited), [restaurant]);
+            var newVisited = RestaurantTools.removeFromList(Array.from(prevState.visited), [restaurant]);
+
+            var newRanks = Object.assign({}, prevState.ranks);
+            delete newRanks[restaurant.id];
+
+            var newRemoved = Array.from(prevState.removed);
+            if (newRemoved.indexOf(restaurant) === -1) {
+                newRemoved.push(restaurant);
+            }
+
+            return {
+                unvisited: newUnvisited,
+                visited: newVisited,
+                removed: newRemoved,
+                ranks: newRanks
+            }
         });
     }
 
-    removeRestaurant(restaurant, afterSetState) {
-        var newUnvisited = RestaurantTools.removeFromList(Array.from(this.state.unvisited), [restaurant]);
-        var newVisited = RestaurantTools.removeFromList(Array.from(this.state.visited), [restaurant]);
-
-        var newRanks = Object.assign({}, this.state.ranks);
-        delete newRanks[restaurant.id];
-
-        var newRemoved = Array.from(this.state.removed);
-        if (newRemoved.indexOf(restaurant) === -1) {
-            newRemoved.push(restaurant);
-        }
-
-        this.setState({
-            unvisited: newUnvisited,
-            visited: newVisited,
-            removed: newRemoved,
-            ranks: newRanks,
-        }, afterSetState);
-    }
-
     checkRestaurantRank(restaurant) {
-        if (RankingTools.rankIsTooLow(this.state.ranks[restaurant.id])) {
-            this.removeRestaurant(restaurant);
-        }
+        this.setState((prevState) => {
+            if (RankingTools.rankIsTooLow(prevState.ranks[restaurant.id])) {
+                this.removeRestaurant(restaurant);
+            }
+            return {};
+        });
     }
 
     checkComplete() {

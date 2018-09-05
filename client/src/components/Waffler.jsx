@@ -130,11 +130,11 @@ class Waffler extends React.Component {
     render() {
         console.log(this.state);
         return (
-            <div id="waffler" class="container-fluid">
-                <div class="row justify-content-center">
+            <div id="waffler" className="container-fluid">
+                <div className="row justify-content-center">
                     {
                         this.state.pair.map(r => (
-                            <div class="col-5 mb-4">
+                            <div className="col-5 mb-4">
                                 <RestaurantCard 
                                     restaurant={r} 
                                     onClick={(e, restaurant) => this.handleSelect(e, restaurant)}

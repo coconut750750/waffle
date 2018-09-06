@@ -1,4 +1,5 @@
 import React from 'react';
+import { withRouter } from 'react-router'
 
 import Restaurant from '../restaurant.js'
 import RestaurantCard from './RestaurantCard.jsx'
@@ -10,6 +11,7 @@ class Waffler extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            num_restaurants: 0,
             unvisited: [],
             visited: [],
             removed: [],
@@ -21,6 +23,7 @@ class Waffler extends React.Component {
 
     setInitial(initialData) {
         this.setState({
+            num_restaurants: initialData.length,
             unvisited: initialData,
             visited: [],
             ranks: initialData.reduce(function(map, obj) {
@@ -59,6 +62,7 @@ class Waffler extends React.Component {
         var other = this.selectRestaurant(restaurant);
         this.updatePair();
         this.checkRestaurantRank(other);
+        this.checkForWin();
     }
 
     selectRestaurant(restaurant) {
@@ -113,6 +117,7 @@ class Waffler extends React.Component {
             delete newRanks[restaurant.id];
 
             return {
+                num_restaurants: prevState.num_restaurants - 1,
                 unvisited: RestaurantTools.removeFromList(Array.from(prevState.unvisited), [restaurant]),
                 visited: RestaurantTools.removeFromList(Array.from(prevState.visited), [restaurant]),
                 removed: RestaurantTools.addToList(prevState.removed, [restaurant]),
@@ -128,6 +133,28 @@ class Waffler extends React.Component {
                 return {
                     rank_threshold: prevState.rank_threshold + MULTIPLIER / 10,
                 };
+            }
+            return {};
+        });
+    }
+
+    checkForWin() {
+        this.setState((prevState) => {
+            if (prevState.num_restaurants < 5) {
+                var maxScore = undefined; var maxId = undefined;
+                for (var id in prevState.ranks) {
+                    if (maxScore === undefined || prevState.ranks[id] > maxScore) {
+                        maxScore = prevState.ranks[id];
+                        maxId = id;
+                    }
+                }
+                var allRestaurants = prevState.visited.concat(prevState.unvisited);
+                var winner = RestaurantTools.getRestaurantById(allRestaurants, maxId);
+
+                this.props.history.push({
+                    pathname: '/results',
+                    state: { winner: winner }
+                });
             }
             return {};
         });
@@ -153,5 +180,5 @@ class Waffler extends React.Component {
         );
     }
 }
-
+Waffler = withRouter(Waffler)
 export default Waffler

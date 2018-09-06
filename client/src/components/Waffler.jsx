@@ -4,6 +4,7 @@ import Restaurant from '../restaurant.js'
 import RestaurantCard from './RestaurantCard.jsx'
 import RestaurantTools from '../restaurant_tools.js'
 import RankingTools from '../ranking_tools.js'
+import { MULTIPLIER } from '../ranking_tools.js'
 
 class Waffler extends React.Component {
     constructor(props) {
@@ -14,6 +15,7 @@ class Waffler extends React.Component {
             removed: [],
             pair: [],
             ranks: {},
+            rank_threshold: 0,
         };
     }
 
@@ -25,6 +27,7 @@ class Waffler extends React.Component {
                         map[obj.id] = 0;
                         return map;
                     }, {}),
+            rank_threshold: MULTIPLIER / -2,            
         });
         this.updatePair();
     }
@@ -120,8 +123,11 @@ class Waffler extends React.Component {
 
     checkRestaurantRank(restaurant) {
         this.setState((prevState) => {
-            if (RankingTools.rankIsTooLow(prevState.ranks[restaurant.id])) {
+            if (prevState.ranks[restaurant.id] < prevState.rank_threshold) {
                 this.removeRestaurant(restaurant);
+                return {
+                    rank_threshold: prevState.rank_threshold + MULTIPLIER / 10,
+                };
             }
             return {};
         });

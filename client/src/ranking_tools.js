@@ -1,4 +1,4 @@
-const MIN_THRESHOLD = -15;
+export const MULTIPLIER = 20;
 
 class RankingTools {
     static calculateP(r1, r2) {
@@ -6,11 +6,7 @@ class RankingTools {
     }
 
     static calculateNewR(r, actual, expected) {
-        return Math.round(r + 30 * (actual - expected));
-    }
-
-    static rankIsTooLow(r) {
-        return r < MIN_THRESHOLD;
+        return Math.round(r + MULTIPLIER * (actual - expected));
     }
 }
 

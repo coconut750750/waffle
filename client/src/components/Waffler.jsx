@@ -11,27 +11,23 @@ class Waffler extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            num_restaurants: 0,
-            unvisited: [],
-            visited: [],
-            removed: [],
-            pair: [],
-            ranks: {},
-            rank_threshold: 0,
+            pair: []
         };
+        this.unvisited = [];
+        this.visited = [];
+        this.removed = [];
+        this.rank_threshold = 0;
+        this.ranks = {};
     }
 
     setInitial(initialData) {
-        this.setState({
-            num_restaurants: initialData.length,
-            unvisited: initialData,
-            visited: [],
-            ranks: initialData.reduce(function(map, obj) {
+        this.unvisited = initialData;
+        this.visited = [];
+        this.rank_threshold = MULTIPLIER / -2;
+        this.ranks = initialData.reduce(function(map, obj) {
                         map[obj.id] = 0;
                         return map;
-                    }, {}),
-            rank_threshold: MULTIPLIER / -2,            
-        });
+                    }, {})
         this.updatePair();
     }
 
@@ -77,40 +73,32 @@ class Waffler extends React.Component {
 
     setNewRanks(selected, unselected) {
         this.setState((prevState) => {
-            var newRanks = Object.assign({}, prevState.ranks);
-            var r1 = newRanks[selected.id];
-            var r2 = newRanks[unselected.id];
-            newRanks[selected.id] = RankingTools.calculateNewR(r1, 1, RankingTools.calculateP(r1, r2));
-            newRanks[unselected.id] = RankingTools.calculateNewR(r2, 0, RankingTools.calculateP(r2, r1));
-        
-            return {
-                ranks: newRanks
-            };
+            var r1 = this.ranks[selected.id];
+            var r2 = this.ranks[unselected.id];
+            this.ranks[selected.id] += RankingTools.calculateRDelta(r1, 1, RankingTools.calculateP(r1, r2));
+            this.ranks[unselected.id] += RankingTools.calculateRDelta(r2, 0, RankingTools.calculateP(r2, r1));
         });
     }
 
     updatePair() {
         this.setState((prevState) => {
             var pair, prevUnvisited, prevVisited;
-            if (prevState.unvisited.length === 0) {
-                prevUnvisited = Array.from(prevState.visited);
-                prevVisited = [];
-                pair = RestaurantTools.getPair(RestaurantTools.removeFromList(prevUnvisited, prevState.pair));
+            if (this.unvisited.length === 0) {
+                this.rank_threshold += MULTIPLIER / 2;
+                this.unvisited = Array.from(this.visited);
+                pair = RestaurantTools.getPair(RestaurantTools.removeFromList(this.unvisited, prevState.pair));
+                this.visited = [];
             } else {
-                if (prevState.unvisited.length === 1) {
-                    pair = [prevState.unvisited[0], RestaurantTools.getRandom(prevState.visited)];
+                if (this.unvisited.length === 1) {
+                    pair = [this.unvisited[0], RestaurantTools.getRandom(this.visited)];
                 } else {
-                    pair = RestaurantTools.getPair(prevState.unvisited);
+                    pair = RestaurantTools.getPair(this.unvisited);
                 }
-                prevUnvisited = prevState.unvisited;
-                prevVisited = prevState.visited;
             }
-            
-            return {
-                pair: pair,
-                unvisited: RestaurantTools.removeFromList(prevUnvisited, pair),
-                visited: RestaurantTools.addToList(prevVisited, pair),
-            }
+
+            this.unvisited = RestaurantTools.removeFromList(this.unvisited, pair);
+            this.visited = RestaurantTools.addToList(this.visited, pair);
+            return { pair: pair };
         });
     }
 
@@ -123,27 +111,16 @@ class Waffler extends React.Component {
     }
 
     removeRestaurant(restaurant) {
-        this.setState((prevState) => {
-            var newRanks = Object.assign({}, prevState.ranks);
-            delete newRanks[restaurant.id];
-
-            return {
-                num_restaurants: prevState.num_restaurants - 1,
-                unvisited: RestaurantTools.removeFromList(Array.from(prevState.unvisited), [restaurant]),
-                visited: RestaurantTools.removeFromList(Array.from(prevState.visited), [restaurant]),
-                removed: RestaurantTools.addToList(prevState.removed, [restaurant]),
-                ranks: newRanks
-            }
-        });
+        delete this.ranks[restaurant.id];
+        this.unvisited = RestaurantTools.removeFromList(Array.from(this.unvisited), [restaurant]);
+        this.visited = RestaurantTools.removeFromList(Array.from(this.visited), [restaurant]);
+        this.removed = RestaurantTools.addToList(this.removed, [restaurant])
     }
 
     checkRestaurantRank(restaurant) {
         this.setState((prevState) => {
-            if (prevState.ranks[restaurant.id] < prevState.rank_threshold) {
+            if (this.ranks[restaurant.id] <= this.rank_threshold) {
                 this.removeRestaurant(restaurant);
-                return {
-                    rank_threshold: prevState.rank_threshold + MULTIPLIER / 10,
-                };
             }
             return {};
         });
@@ -151,15 +128,15 @@ class Waffler extends React.Component {
 
     checkForWin() {
         this.setState((prevState) => {
-            if (prevState.num_restaurants < 5) {
+            if (Object.keys(this.ranks).length < 5) {
                 var maxScore = undefined; var maxId = undefined;
-                for (var id in prevState.ranks) {
-                    if (maxScore === undefined || prevState.ranks[id] > maxScore) {
-                        maxScore = prevState.ranks[id];
+                for (var id in this.ranks) {
+                    if (maxScore === undefined || this.ranks[id] > maxScore) {
+                        maxScore = this.ranks[id];
                         maxId = id;
                     }
                 }
-                var allRestaurants = prevState.visited.concat(prevState.unvisited);
+                var allRestaurants = this.visited.concat(this.unvisited);
                 var winner = RestaurantTools.getRestaurantById(allRestaurants, maxId);
 
                 this.props.history.push({
@@ -172,7 +149,6 @@ class Waffler extends React.Component {
     }
 
     render() {
-        console.log(this.state);
         return (
             <div id="waffler" className="container-fluid">
                 <div className="row justify-content-center mb-4">
@@ -194,5 +170,6 @@ class Waffler extends React.Component {
         );
     }
 }
+
 Waffler = withRouter(Waffler)
 export default Waffler

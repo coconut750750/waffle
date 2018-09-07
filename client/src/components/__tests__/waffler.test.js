@@ -34,31 +34,31 @@ describe('Waffler', () => {
     });
 
     it('setting up restaurants', () => {
-        expect(wrapper.state('unvisited').length).toBe(4);
-        expect(wrapper.state('visited').length).toBe(2);
-        expect(wrapper.state('ranks')['1']).toBe(0);
+        expect(instance.unvisited.length).toBe(4);
+        expect(instance.visited.length).toBe(2);
+        expect(instance.ranks['1']).toBe(0);
         expect(wrapper.state('pair').length).toBe(2);
         expect(wrapper.state('pair')[0]).not.toBe(wrapper.state('pair')[1]);
     });
 
     it('getting first 3 pairs', () => {
-        expect(wrapper.state('unvisited').length).toBe(4);
-        expect(wrapper.state('visited').length).toBe(2);
+        expect(instance.unvisited.length).toBe(4);
+        expect(instance.visited.length).toBe(2);
         visitN(instance, 3);
-        expect(wrapper.state('unvisited').length).toBe(0);
-        expect(wrapper.state('visited').length).toBe(6);
+        expect(instance.unvisited.length).toBe(0);
+        expect(instance.visited.length).toBe(6);
     });
 
     it('getting new ranks', () => {
         var pair = wrapper.state('pair');
         var selected = pair[0];
-        var selectedRankBefore = wrapper.state('ranks')[selected.id];
+        var selectedRankBefore = instance.ranks[selected.id];
         var unselected = pair[1];
-        var unselectedRankBefore = wrapper.state('ranks')[unselected.id];
+        var unselectedRankBefore = instance.ranks[unselected.id];
 
         instance.setNewRanks(selected, unselected);
-        expect(wrapper.state('ranks')[selected.id]).toBeGreaterThan(selectedRankBefore);
-        expect(wrapper.state('ranks')[unselected.id]).toBeLessThan(unselectedRankBefore);
+        expect(instance.ranks[selected.id]).toBeGreaterThan(selectedRankBefore);
+        expect(instance.ranks[unselected.id]).toBeLessThan(unselectedRankBefore);
     });
 
     it('getting pairs after first 3', () => {
@@ -66,8 +66,8 @@ describe('Waffler', () => {
 
         var origPair = wrapper.state('pair');
         instance.updatePair();
-        expect(wrapper.state('visited').length).toBe(2);
-        expect(wrapper.state('unvisited').length).toBe(4);
+        expect(instance.visited.length).toBe(2);
+        expect(instance.unvisited.length).toBe(4);
         expect(wrapper.state('pair')[0]).not.toBe(origPair[0]);
         expect(wrapper.state('pair')[1]).not.toBe(origPair[1]);
     });
@@ -76,24 +76,24 @@ describe('Waffler', () => {
         var origPair = wrapper.state('pair');
 
         var selectedId = origPair[0].id; 
-        var selectedRank = wrapper.state('ranks')[selectedId];
+        var selectedRank = instance.ranks[selectedId];
 
         var otherId = origPair[1].id;
-        var otherRank = wrapper.state('ranks')[otherId];
+        var otherRank = instance.ranks[otherId];
 
         instance.selectRestaurant(origPair[0]);
-        expect(wrapper.state('unvisited').length).toBe(4);
-        expect(wrapper.state('visited').length).toBe(2);
-        expect(wrapper.state('ranks')[selectedId]).toBeGreaterThan(selectedRank);
-        expect(wrapper.state('ranks')[otherId]).toBeLessThan(otherRank);
+        expect(instance.unvisited.length).toBe(4);
+        expect(instance.visited.length).toBe(2);
+        expect(instance.ranks[selectedId]).toBeGreaterThan(selectedRank);
+        expect(instance.ranks[otherId]).toBeLessThan(otherRank);
     });
 
     it('removing restaurants before all visited', () => {
         var toRemove = wrapper.state('pair')[0];
         instance.removeRestaurant(toRemove);
 
-        expect(wrapper.state('visited').length).toBe(1);
-        expect(wrapper.state('ranks')[toRemove.id]).toBe(undefined);
+        expect(instance.visited.length).toBe(1);
+        expect(instance.ranks[toRemove.id]).toBe(undefined);
     });
 
     it('removing restaurants after all visited', () => {
@@ -102,9 +102,9 @@ describe('Waffler', () => {
         var toRemove = wrapper.state('pair')[0];
         instance.removeRestaurant(toRemove);
 
-        expect(wrapper.state('removed')[0].id).toBe(toRemove.id);
-        expect(wrapper.state('visited').length).toBe(5);
-        expect(wrapper.state('ranks')[toRemove.id]).toBe(undefined);
+        expect(instance.removed[0].id).toBe(toRemove.id);
+        expect(instance.visited.length).toBe(5);
+        expect(instance.ranks[toRemove.id]).toBe(undefined);
     });
 
     it('removing restaurants multiple times', () => {
@@ -112,6 +112,6 @@ describe('Waffler', () => {
         instance.removeRestaurant(toRemove);
         instance.removeRestaurant(toRemove);
         instance.removeRestaurant(toRemove);
-        expect(wrapper.state('removed').length).toBe(1);
+        expect(instance.removed.length).toBe(1);
     });
 });

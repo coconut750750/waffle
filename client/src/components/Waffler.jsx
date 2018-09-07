@@ -65,19 +65,28 @@ class Waffler extends React.Component {
         this.checkForWin();
     }
 
-    selectRestaurant(restaurant) {
+    selectRestaurant(restaurant, reverse=false) {
         var other = this.state.pair[0].id === restaurant.id ? this.state.pair[1] : this.state.pair[0];
-        this.getNewRanks(restaurant, other);
+        if (!reverse) {
+            this.setNewRanks(restaurant, other);
+        } else {
+            this.setNewRanks(other, restaurant);
+        }
         return other;
     }
 
-    getNewRanks(selected, unselected) {
-        var newRanks = Object.assign({}, this.state.ranks);
-        var r1 = newRanks[selected.id];
-        var r2 = newRanks[unselected.id];
-        newRanks[selected.id] = RankingTools.calculateNewR(r1, 1, RankingTools.calculateP(r1, r2));
-        newRanks[unselected.id] = RankingTools.calculateNewR(r2, 0, RankingTools.calculateP(r2, r1));
-        this.setState({ranks: newRanks});
+    setNewRanks(selected, unselected) {
+        this.setState((prevState) => {
+            var newRanks = Object.assign({}, prevState.ranks);
+            var r1 = newRanks[selected.id];
+            var r2 = newRanks[unselected.id];
+            newRanks[selected.id] = RankingTools.calculateNewR(r1, 1, RankingTools.calculateP(r1, r2));
+            newRanks[unselected.id] = RankingTools.calculateNewR(r2, 0, RankingTools.calculateP(r2, r1));
+        
+            return {
+                ranks: newRanks
+            };
+        });
     }
 
     updatePair() {
@@ -107,8 +116,10 @@ class Waffler extends React.Component {
 
     handleRemove(e, restaurant) {
         e.stopPropagation();
+        this.selectRestaurant(restaurant, true)
         this.removeRestaurant(restaurant);
         this.updatePair();
+        this.checkForWin();
     }
 
     removeRestaurant(restaurant) {
@@ -164,6 +175,9 @@ class Waffler extends React.Component {
         console.log(this.state);
         return (
             <div id="waffler" className="container-fluid">
+                <div className="row justify-content-center mb-4">
+                    <h4>Choose One!</h4>
+                </div>
                 <div className="row justify-content-center">
                     {
                         this.state.pair.map(r => (

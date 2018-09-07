@@ -28,7 +28,7 @@ describe('Waffler', () => {
             new Restaurant('5', 'Cold Stone', 3, 4.5, '')
         ];
 
-        wrapper = shallow(<Waffler />);
+        wrapper = shallow(<Waffler.WrappedComponent />);
         instance = wrapper.instance();
         instance.setInitial(restaurants);
     });
@@ -56,7 +56,7 @@ describe('Waffler', () => {
         var unselected = pair[1];
         var unselectedRankBefore = wrapper.state('ranks')[unselected.id];
 
-        instance.getNewRanks(selected, unselected);
+        instance.setNewRanks(selected, unselected);
         expect(wrapper.state('ranks')[selected.id]).toBeGreaterThan(selectedRankBefore);
         expect(wrapper.state('ranks')[unselected.id]).toBeLessThan(unselectedRankBefore);
     });

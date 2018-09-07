@@ -19,7 +19,7 @@ app.get('/api/yelp', (req, res) => {
 
     client.search({
         term: 'restaurants',
-        location: 'princeton, nj'
+        location: 'bellevue, wa'
     }).then(response => {
         res.send({
             data: response.jsonBody.businesses

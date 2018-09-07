@@ -72,34 +72,30 @@ class Waffler extends React.Component {
     }
 
     setNewRanks(selected, unselected) {
-        this.setState((prevState) => {
-            var r1 = this.ranks[selected.id];
-            var r2 = this.ranks[unselected.id];
-            this.ranks[selected.id] += RankingTools.calculateRDelta(r1, 1, RankingTools.calculateP(r1, r2));
-            this.ranks[unselected.id] += RankingTools.calculateRDelta(r2, 0, RankingTools.calculateP(r2, r1));
-        });
+        var r1 = this.ranks[selected.id];
+        var r2 = this.ranks[unselected.id];
+        this.ranks[selected.id] += RankingTools.calculateRDelta(r1, 1, RankingTools.calculateP(r1, r2));
+        this.ranks[unselected.id] += RankingTools.calculateRDelta(r2, 0, RankingTools.calculateP(r2, r1));
     }
 
     updatePair() {
-        this.setState((prevState) => {
-            var pair, prevUnvisited, prevVisited;
-            if (this.unvisited.length === 0) {
-                this.rank_threshold += MULTIPLIER / 2;
-                this.unvisited = Array.from(this.visited);
-                pair = RestaurantTools.getPair(RestaurantTools.removeFromList(this.unvisited, prevState.pair));
-                this.visited = [];
+        var pair;
+        if (this.unvisited.length === 0) {
+            this.rank_threshold += MULTIPLIER / 2;
+            this.unvisited = Array.from(this.visited);
+            pair = RestaurantTools.getPair(RestaurantTools.removeFromList(this.unvisited, this.state.pair));
+            this.visited = [];
+        } else {
+            if (this.unvisited.length === 1) {
+                pair = [this.unvisited[0], RestaurantTools.getRandom(this.visited)];
             } else {
-                if (this.unvisited.length === 1) {
-                    pair = [this.unvisited[0], RestaurantTools.getRandom(this.visited)];
-                } else {
-                    pair = RestaurantTools.getPair(this.unvisited);
-                }
+                pair = RestaurantTools.getPair(this.unvisited);
             }
+        }
 
-            this.unvisited = RestaurantTools.removeFromList(this.unvisited, pair);
-            this.visited = RestaurantTools.addToList(this.visited, pair);
-            return { pair: pair };
-        });
+        this.unvisited = RestaurantTools.removeFromList(this.unvisited, pair);
+        this.visited = RestaurantTools.addToList(this.visited, pair);
+        this.setState({ pair: pair });
     }
 
     handleRemove(e, restaurant) {
@@ -118,34 +114,28 @@ class Waffler extends React.Component {
     }
 
     checkRestaurantRank(restaurant) {
-        this.setState((prevState) => {
-            if (this.ranks[restaurant.id] <= this.rank_threshold) {
-                this.removeRestaurant(restaurant);
-            }
-            return {};
-        });
+        if (this.ranks[restaurant.id] <= this.rank_threshold) {
+            this.removeRestaurant(restaurant);
+        }
     }
 
     checkForWin() {
-        this.setState((prevState) => {
-            if (Object.keys(this.ranks).length < 5) {
-                var maxScore = undefined; var maxId = undefined;
-                for (var id in this.ranks) {
-                    if (maxScore === undefined || this.ranks[id] > maxScore) {
-                        maxScore = this.ranks[id];
-                        maxId = id;
-                    }
+        if (Object.keys(this.ranks).length < 5) {
+            var maxScore = undefined; var maxId = undefined;
+            for (var id in this.ranks) {
+                if (maxScore === undefined || this.ranks[id] > maxScore) {
+                    maxScore = this.ranks[id];
+                    maxId = id;
                 }
-                var allRestaurants = this.visited.concat(this.unvisited);
-                var winner = RestaurantTools.getRestaurantById(allRestaurants, maxId);
-
-                this.props.history.push({
-                    pathname: '/results',
-                    state: { winner: winner }
-                });
             }
-            return {};
-        });
+            var allRestaurants = this.visited.concat(this.unvisited);
+            var winner = RestaurantTools.getRestaurantById(allRestaurants, maxId);
+
+            this.props.history.push({
+                pathname: '/results',
+                state: { winner: winner }
+            });
+        }
     }
 
     render() {

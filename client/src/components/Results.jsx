@@ -11,7 +11,6 @@ class Results extends React.Component {
         };
     }
     render() {
-        console.log(this.state);
         return (
             <div id="results" className="container-fluid">
                 <div className="row justify-content-center mb-4">

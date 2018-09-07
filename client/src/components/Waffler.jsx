@@ -39,7 +39,7 @@ class Waffler extends React.Component {
     }
 
     async callApi() {
-        const response = await fetch('/api/yelp');
+        const response = await fetch('/api/yelp?city=chicago');
         const body = await response.json();
         if (response.status !== 200) throw Error(body.message);
         return body;
@@ -161,5 +161,5 @@ class Waffler extends React.Component {
     }
 }
 
-Waffler = withRouter(Waffler)
-export default Waffler
+Waffler = withRouter(Waffler);
+export default Waffler;

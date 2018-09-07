@@ -12,14 +12,14 @@ const port = process.env.PORT || 5000;
 app.get('/api/yelp', (req, res) => {
     const yelp = require('yelp-fusion');
 
+    var query = req.query;
+    var city = req.query.city ? req.query.city : 'san francisco';
+
     const apiKey = process.env.YELP_APIKEY;
-    console.log(apiKey);
-
     const client = yelp.client(apiKey);
-
     client.search({
         term: 'restaurants',
-        location: 'bellevue, wa'
+        location: city,
     }).then(response => {
         res.send({
             data: response.jsonBody.businesses

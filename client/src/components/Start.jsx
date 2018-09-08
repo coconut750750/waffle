@@ -2,10 +2,14 @@ import React from 'react'
 
 import Waffler from './Waffler.jsx'
 
-const Start = () => (
-  <div>
-    <Waffler />
-  </div>
-)
+class Start extends React.Component {
+    render() {
+        return (
+          <div>
+            <Waffler query={ this.props.location.state.query }/>
+          </div>
+        );
+    }
+}
 
 export default Start

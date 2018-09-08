@@ -1,11 +1,11 @@
 import React from 'react'
 import Header from './Header.jsx'
-import Main from './Main.jsx'
+import Router from './Router.jsx'
 
 const App = () => (
   <div>
     <Header />
-    <Main />
+    <Router />
   </div>
 )
 

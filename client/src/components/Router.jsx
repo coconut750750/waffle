@@ -5,7 +5,7 @@ import Home from './Home.jsx'
 import Start from './Start.jsx'
 import Results from './Results.jsx'
 
-const Main = () => (
+const Router = () => (
   <main>
     <Switch>
       <Route exact path='/' component={Home}/>
@@ -15,4 +15,4 @@ const Main = () => (
   </main>
 )
 
-export default Main
+export default Router

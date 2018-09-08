@@ -13,6 +13,7 @@ class Waffler extends React.Component {
         this.state = {
             pair: []
         };
+        this.query = props.query;
         this.unvisited = [];
         this.visited = [];
         this.removed = [];
@@ -39,7 +40,7 @@ class Waffler extends React.Component {
     }
 
     async callApi() {
-        const response = await fetch('/api/yelp?city=chicago');
+        const response = await fetch(`/api/yelp?city=${this.query}`);
         const body = await response.json();
         if (response.status !== 200) throw Error(body.message);
         return body;

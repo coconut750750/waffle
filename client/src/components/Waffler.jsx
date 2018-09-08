@@ -11,9 +11,8 @@ class Waffler extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            pair: []
+            pair: [],
         };
-        this.query = props.query;
         this.unvisited = [];
         this.visited = [];
         this.removed = [];
@@ -27,20 +26,28 @@ class Waffler extends React.Component {
         this.rank_threshold = MULTIPLIER / -2;
         this.ranks = initialData.reduce(function(map, obj) {
                         map[obj.id] = 0;
-                        return map;
-                    }, {})
+                        return map;}, {})
         this.updatePair();
     }
 
     componentDidMount() {
-        this.callApi().then(res => {
+        if (this.props.city !== undefined) {
+            this.requestApi(`city=${this.props.city}`);
+        } else {
+            var coords = this.props.coords;
+            this.requestApi(`lat=${coords.latitude}&long=${coords.longitude}`);
+        }
+    }
+
+    requestApi(query) {
+        this.callApi(query).then(res => {
             var restData = this.transformData(res.data);
             this.setInitial(restData);
             }).catch(err => console.log(err));
     }
 
-    async callApi() {
-        const response = await fetch(`/api/yelp?city=${this.query}`);
+    async callApi(query) {
+        var response = await fetch(`/api/yelp?${query}`);
         const body = await response.json();
         if (response.status !== 200) throw Error(body.message);
         return body;
@@ -148,7 +155,7 @@ class Waffler extends React.Component {
                 <div className="row justify-content-center">
                     {
                         this.state.pair.map(r => (
-                            <div className="col-5 mb-4">
+                            <div className="col-6 mb-4">
                                 <RestaurantCard 
                                     restaurant={r} 
                                     onClick={(e, restaurant) => this.handleSelect(e, restaurant)}
@@ -162,5 +169,4 @@ class Waffler extends React.Component {
     }
 }
 
-Waffler = withRouter(Waffler);
-export default Waffler;
+export default withRouter(Waffler);

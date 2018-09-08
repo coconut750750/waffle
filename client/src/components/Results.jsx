@@ -17,7 +17,7 @@ class Results extends React.Component {
                     <h4>Winner!</h4>
                 </div>
                 <div className="row justify-content-center">
-                    <div className="col-5 mb-4">
+                    <div className="col-6 mb-4">
                         <RestaurantCard restaurant={this.state.winner}/>
                     </div>
                 </div>

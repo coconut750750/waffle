@@ -1,6 +1,8 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
+import {geolocated} from 'react-geolocated';
 
+import Geolocator from './Geolocator.jsx'
 import Search from './Search.jsx'
 
 class Home extends React.Component {
@@ -9,7 +11,21 @@ class Home extends React.Component {
         this.state = {
             query: "",
         };
+
+        this.getInnerRef = this.getInnerRef.bind(this);
+        this.getLocation = this.getLocation.bind(this);
     }
+
+      innerRef;
+      getInnerRef(ref) {
+        this.innerRef = ref;
+      }
+
+      getLocation() {
+        this.innerRef && this.innerRef.getLocation();
+      }
+
+
 
     updateQuery(e) {
         this.setState({
@@ -18,8 +34,11 @@ class Home extends React.Component {
     }
 
     render() {
+
+        console.log(this.props.positionError);
         return (
             <div className="container-fluid">
+                <Geolocator ref={this.getInnerRef} />
                 <div className="row justify-content-center">
                     <div className="col-4 text-center">
                         <Search updateQuery={(e) => this.updateQuery(e)}/>
@@ -38,4 +57,9 @@ class Home extends React.Component {
     }
 }
 
-export default Home
+export default geolocated({
+    positionOptions: {
+        enableHighAccuracy: false,
+    },
+        userDecisionTimeout: 5000,
+    })(Home);

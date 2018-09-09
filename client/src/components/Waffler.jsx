@@ -5,7 +5,6 @@ import Restaurant from '../restaurant.js'
 import RestaurantCard from './RestaurantCard.jsx'
 import RestaurantTools from '../restaurant_tools.js'
 import RankingTools from '../ranking_tools.js'
-import { MULTIPLIER } from '../ranking_tools.js'
 
 class Waffler extends React.Component {
     constructor(props) {
@@ -13,20 +12,19 @@ class Waffler extends React.Component {
         this.state = {
             pair: [],
         };
+        this.numRestaurants = 0;
         this.unvisited = [];
         this.visited = [];
         this.removed = [];
-        this.rank_threshold = 0;
-        this.ranks = {};
+        this.numPairPerc = 0.5;
+        this.numPairDecay = 0.75;
+        this.curPair = 0;
     }
 
     setInitial(initialData) {
+        this.numRestaurants = initialData.length;
         this.unvisited = initialData;
         this.visited = [];
-        this.rank_threshold = MULTIPLIER / -2;
-        this.ranks = initialData.reduce(function(map, obj) {
-                        map[obj.id] = 0;
-                        return map;}, {})
         this.updatePair();
     }
 
@@ -63,10 +61,8 @@ class Waffler extends React.Component {
     }
 
     handleSelect(e, restaurant) {
-        var other = this.selectRestaurant(restaurant);
+        this.selectRestaurant(restaurant);
         this.updatePair();
-        this.checkRestaurantRank(other);
-        this.checkForWin();
     }
 
     selectRestaurant(restaurant, reverse=false) {
@@ -76,30 +72,32 @@ class Waffler extends React.Component {
         } else {
             this.setNewRanks(other, restaurant);
         }
-        return other;
     }
 
     setNewRanks(selected, unselected) {
-        var r1 = this.ranks[selected.id];
-        var r2 = this.ranks[unselected.id];
-        this.ranks[selected.id] += RankingTools.calculateRDelta(r1, 1, RankingTools.calculateP(r1, r2));
-        this.ranks[unselected.id] += RankingTools.calculateRDelta(r2, 0, RankingTools.calculateP(r2, r1));
+        var r1 = selected.rank;
+        var r2 = unselected.rank;
+        selected.rank += RankingTools.calculateRDelta(r1, 1, RankingTools.calculateP(r1, r2));
+        unselected.rank += RankingTools.calculateRDelta(r2, 0, RankingTools.calculateP(r2, r1));
     }
 
     updatePair() {
         var pair;
-        if (this.unvisited.length === 0) {
-            this.rank_threshold += MULTIPLIER / 2;
-            this.unvisited = Array.from(this.visited);
+        if (this.curPair === Math.floor(this.numPairPerc * this.numRestaurants)) {
+            this.unvisited = this.unvisited.concat(this.visited);
             pair = RestaurantTools.getPair(RestaurantTools.removeFromList(this.unvisited, this.state.pair));
             this.visited = [];
-        } else {
-            if (this.unvisited.length === 1) {
-                pair = [this.unvisited[0], RestaurantTools.getRandom(this.visited)];
-            } else {
-                pair = RestaurantTools.getPair(this.unvisited);
+            this.numPairPerc = this.numPairPerc * this.numPairDecay;
+            this.curPair = 1;
+            if (Math.floor(this.numPairPerc * this.numRestaurants) === 0) {
+                this.getResults();
+                return;
             }
+        } else {
+            this.curPair++;
+            pair = RestaurantTools.getPair(this.unvisited);
         }
+        console.log(pair[0].rank + " " + pair[1].rank);
 
         this.unvisited = RestaurantTools.removeFromList(this.unvisited, pair);
         this.visited = RestaurantTools.addToList(this.visited, pair);
@@ -111,39 +109,29 @@ class Waffler extends React.Component {
         this.selectRestaurant(restaurant, true)
         this.removeRestaurant(restaurant);
         this.updatePair();
-        this.checkForWin();
     }
 
     removeRestaurant(restaurant) {
-        delete this.ranks[restaurant.id];
+        this.numRestaurants--;
         this.unvisited = RestaurantTools.removeFromList(Array.from(this.unvisited), [restaurant]);
         this.visited = RestaurantTools.removeFromList(Array.from(this.visited), [restaurant]);
-        this.removed = RestaurantTools.addToList(this.removed, [restaurant])
+        this.removed = RestaurantTools.addToList(this.removed, [restaurant]);
     }
 
-    checkRestaurantRank(restaurant) {
-        if (this.ranks[restaurant.id] <= this.rank_threshold) {
-            this.removeRestaurant(restaurant);
-        }
-    }
-
-    checkForWin() {
-        if (Object.keys(this.ranks).length < 5) {
-            var maxScore = undefined; var maxId = undefined;
-            for (var id in this.ranks) {
-                if (maxScore === undefined || this.ranks[id] > maxScore) {
-                    maxScore = this.ranks[id];
-                    maxId = id;
-                }
+    getResults() {
+        var bestRestaurant = undefined;
+        var allRestaurants = this.visited.concat(this.unvisited);
+        allRestaurants.forEach(function(restaurant) {
+            console.log("final: " + restaurant.rank);
+            if (bestRestaurant === undefined || restaurant.rank > bestRestaurant.rank) {
+                bestRestaurant = restaurant;
             }
-            var allRestaurants = this.visited.concat(this.unvisited);
-            var winner = RestaurantTools.getRestaurantById(allRestaurants, maxId);
+        });
 
-            this.props.history.push({
-                pathname: '/results',
-                state: { winner: winner }
-            });
-        }
+        this.props.history.push({
+            pathname: '/results',
+            state: { winner: bestRestaurant }
+        });
     }
 
     render() {

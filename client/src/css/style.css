@@ -3,3 +3,9 @@ body {
   padding: 0;
   font-family: 'Roboto', sans-serif;
 }
+
+.back-image {
+    background-image: url('/images/waffle_back.png');
+    background-attachment: fixed;
+    background-size: cover;
+}

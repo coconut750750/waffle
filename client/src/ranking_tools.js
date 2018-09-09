@@ -1,4 +1,4 @@
-export const MULTIPLIER = 20;
+export const MULTIPLIER = 500;
 
 class RankingTools {
     static calculateP(r1, r2) {

@@ -23,6 +23,24 @@ describe('RestaurantTools', () => {
         expect(pair[0].id).not.toBe(pair[1].id);
     });
 
+    it('get weighted random', () => {
+        restaurants = [
+            new Restaurant('0', 'Cravings', 4, 3.5, ''),
+            new Restaurant('1', 'Potbelly', 2, 4, ''),
+        ];
+        restaurants[0].rank = 10;
+        restaurants[1].rank = 5;
+        var totalIters = 100;
+        var restOneCount = 0;
+        for (var i = 0; i < totalIters; i++) {
+            var randomRest = RestaurantTools.getRandom(restaurants);
+            if (randomRest.id == restaurants[0].id) {
+                restOneCount++;
+            }
+        }
+        expect(restOneCount).toBeGreaterThan(totalIters / 2);
+    });
+
     it('remove restaurant', () => {
         var toRemove = restaurants[0];
         var newRests = RestaurantTools.removeFromList(restaurants, [toRemove]);

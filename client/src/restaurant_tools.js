@@ -1,17 +1,37 @@
-/*
-Taken from: https://stackoverflow.com/questions/19269545/how-to-get-n-no-elements-randomly-from-an-array
-*/
-function getRandom(arr, n) {
-    var result = new Array(n),
-        len = arr.length,
-        taken = new Array(len);
-    if (n > len)
-        throw new RangeError("getRandom: more elements taken than available");
-    while (n--) {
-        var x = Math.floor(Math.random() * len);
-        result[n] = arr[x in taken ? taken[x] : x];
-        taken[x] = --len in taken ? taken[len] : len;
+function getRankSum(restaurants) {
+    var rankSum = 0;
+    restaurants.forEach(function(restaurant) {
+        rankSum += restaurant.rank;
+    });
+    return rankSum;
+}
+
+function getIndexAtRankSum(restaurants, rankSum) {
+    var curRankSum = 0;
+    for (var i = 0; i < restaurants.length; i++) {
+        curRankSum += restaurants[i].rank;
+        if (curRankSum >= rankSum) {
+            return i;
+        }
     }
+}
+
+function getWeightedRandom(restaurants, n) {
+    if (n > restaurants.length) {
+        throw new RangeError("getRandom(): more elements taken than available");
+    }
+
+    var result = [];
+    var untaken = Array.from(restaurants);
+
+    while (n--) {
+        var rankSum = getRankSum(untaken);
+        var x = Math.floor(Math.random() * rankSum);
+        var index = getIndexAtRankSum(untaken, x);
+        result.push(untaken[index]);
+        untaken.splice(index, 1);
+    }
+
     return result;
 }
 
@@ -58,11 +78,11 @@ class RestaurantTools {
     }
 
     static getPair(restaurants) {
-        return getRandom(restaurants, 2);
+        return getWeightedRandom(restaurants, 2);
     }
 
     static getRandom(restaurants) {
-        return getRandom(restaurants, 1)[0];
+        return getWeightedRandom(restaurants, 1)[0];
     }
 }
 

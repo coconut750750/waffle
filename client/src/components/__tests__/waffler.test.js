@@ -28,7 +28,7 @@ describe('Waffler', () => {
             new Restaurant('5', 'Cold Stone', 3, 4.5, '')
         ];
 
-        wrapper = shallow(<Waffler.WrappedComponent />);
+        wrapper = shallow(<Waffler.WrappedComponent city="san francisco"/>);
         instance = wrapper.instance();
         instance.setInitial(restaurants);
     });
@@ -36,7 +36,7 @@ describe('Waffler', () => {
     it('setting up restaurants', () => {
         expect(instance.unvisited.length).toBe(4);
         expect(instance.visited.length).toBe(2);
-        expect(instance.ranks['1']).toBe(0);
+        expect(restaurants[1].rank).toBe(1000);
         expect(wrapper.state('pair').length).toBe(2);
         expect(wrapper.state('pair')[0]).not.toBe(wrapper.state('pair')[1]);
     });
@@ -52,13 +52,13 @@ describe('Waffler', () => {
     it('getting new ranks', () => {
         var pair = wrapper.state('pair');
         var selected = pair[0];
-        var selectedRankBefore = instance.ranks[selected.id];
+        var selectedRankBefore = selected.rank;
         var unselected = pair[1];
-        var unselectedRankBefore = instance.ranks[unselected.id];
+        var unselectedRankBefore = unselected.rank;
 
         instance.setNewRanks(selected, unselected);
-        expect(instance.ranks[selected.id]).toBeGreaterThan(selectedRankBefore);
-        expect(instance.ranks[unselected.id]).toBeLessThan(unselectedRankBefore);
+        expect(selected.rank).toBeGreaterThan(selectedRankBefore);
+        expect(unselected.rank).toBeLessThan(unselectedRankBefore);
     });
 
     it('getting pairs after first 3', () => {
@@ -75,17 +75,14 @@ describe('Waffler', () => {
     it('selecting restaurants', () => {
         var origPair = wrapper.state('pair');
 
-        var selectedId = origPair[0].id; 
-        var selectedRank = instance.ranks[selectedId];
-
-        var otherId = origPair[1].id;
-        var otherRank = instance.ranks[otherId];
+        var selectedRank = origPair[0].rank;
+        var otherRank = origPair[1].rank;
 
         instance.selectRestaurant(origPair[0]);
         expect(instance.unvisited.length).toBe(4);
         expect(instance.visited.length).toBe(2);
-        expect(instance.ranks[selectedId]).toBeGreaterThan(selectedRank);
-        expect(instance.ranks[otherId]).toBeLessThan(otherRank);
+        expect(origPair[0].rank).toBeGreaterThan(selectedRank);
+        expect(origPair[1].rank).toBeLessThan(otherRank);
     });
 
     it('removing restaurants before all visited', () => {
@@ -93,7 +90,6 @@ describe('Waffler', () => {
         instance.removeRestaurant(toRemove);
 
         expect(instance.visited.length).toBe(1);
-        expect(instance.ranks[toRemove.id]).toBe(undefined);
     });
 
     it('removing restaurants after all visited', () => {
@@ -104,7 +100,6 @@ describe('Waffler', () => {
 
         expect(instance.removed[0].id).toBe(toRemove.id);
         expect(instance.visited.length).toBe(5);
-        expect(instance.ranks[toRemove.id]).toBe(undefined);
     });
 
     it('removing restaurants multiple times', () => {

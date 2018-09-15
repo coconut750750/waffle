@@ -1,4 +1,17 @@
 #home {
-    padding-top: 35vh;
+    padding-top: 30vh;
     height: 100vh;
+}
+
+#start.btn {
+    background-color: #eba333;
+    border-color: #eba333;
+    color: #611c14;
+}
+
+#start.btn:hover {
+    background-color: #eba333;
+    border-color: #eba333;
+    color: #611c14;
+    box-shadow: 0 0.5rem 1.5rem #611c14;
 }

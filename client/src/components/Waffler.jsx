@@ -17,7 +17,7 @@ class Waffler extends React.Component {
         this.visited = [];
         this.removed = [];
         this.numPairPerc = 0.5;
-        this.numPairDecay = 0.75;
+        this.numPairDecay = 2.0 / 3.0;
         this.curPair = 0;
     }
 

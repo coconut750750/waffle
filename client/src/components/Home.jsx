@@ -23,11 +23,11 @@ class Home extends React.Component {
             <div id="home" className="container-fluid back-image">
                 <div className="row justify-content-center mb-4">
                     <div className="col text-center">
-                        <Link to='/' id='logo'><h3>Waffle</h3></Link>
+                        <Link to='/'><img style={{width: '35%'}} src="/images/waffle_logo.png" alt="logo"/></Link>
                     </div>
                 </div>
                 <div className="row justify-content-center">
-                    <div className="col-8 text-center">
+                    <div className="col-6 text-center">
                         <Search updateQuery={(e) => this.updateQuery(e)}/>
                     </div>
                 </div>
@@ -36,7 +36,7 @@ class Home extends React.Component {
                         <Link to={{
                             pathname: '/start',
                             state: { query: this.state.query }
-                        }}><button type="button" className="btn btn-primary">Start</button></Link>
+                        }}><button type="submit" id="start" className="btn btn-primary btn-lg">Start</button></Link>
                     </div>
                 </div>
             </div>

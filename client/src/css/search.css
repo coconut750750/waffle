@@ -1,0 +1,24 @@
+.search_title {
+    background: #eba333;
+    border: 1px solid #eba333;
+    color: #611c14;
+    font-weight: 500;
+}
+
+input[type="text"],
+select,
+textarea {
+    transition: all 0.30s ease-in-out;
+    border: 1px solid #eba333;
+    color: #611c14;
+}
+
+input[type="text"]::placeholder {
+    color: #d68a1588;
+}
+
+input[type="text"]:focus {
+    box-shadow: 0 0 10px #eba333;
+    border: 1px solid #eba333;
+    color: #611c14;
+}

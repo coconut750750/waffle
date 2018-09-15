@@ -19,16 +19,19 @@ function getIndexAtRankSum(restaurants, rankSum) {
 function getWeightedRandom(restaurants, n) {
     if (n > restaurants.length) {
         throw new RangeError("getRandom(): more elements taken than available");
+    } if (n < 0) {
+        throw new RangeError("getRandom(): negative n");
     }
 
     var result = [];
     var untaken = Array.from(restaurants);
+    var rankSum = getRankSum(untaken);
 
     while (n--) {
-        var rankSum = getRankSum(untaken);
         var x = Math.floor(Math.random() * rankSum);
         var index = getIndexAtRankSum(untaken, x);
         result.push(untaken[index]);
+        rankSum -= untaken[index].rank;
         untaken.splice(index, 1);
     }
 
@@ -83,6 +86,10 @@ class RestaurantTools {
 
     static getRandom(restaurants) {
         return getWeightedRandom(restaurants, 1)[0];
+    }
+
+    static getN(restaurants, n) {
+        return getWeightedRandom(restaurants, n);
     }
 }
 

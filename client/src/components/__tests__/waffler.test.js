@@ -7,9 +7,9 @@ import Restaurant from '../../restaurant.js'
 
 configure({adapter: new Adapter()});
 
-function visitN(instance, totalPairs) {
+function visitN(instance, wrapper, totalPairs) {
     for (var i = 0; i < totalPairs - 1; i++) {
-        instance.updatePair();
+        instance.handleSelect(wrapper.state('pair')[0]);
     }
 }
 
@@ -35,18 +35,29 @@ describe('Waffler', () => {
 
     it('setting up restaurants', () => {
         expect(instance.unvisited.length).toBe(4);
-        expect(instance.visited.length).toBe(2);
         expect(restaurants[1].rank).toBe(1000);
         expect(wrapper.state('pair').length).toBe(2);
         expect(wrapper.state('pair')[0]).not.toBe(wrapper.state('pair')[1]);
     });
 
-    it('getting first 3 pairs', () => {
-        expect(instance.unvisited.length).toBe(4);
-        expect(instance.visited.length).toBe(2);
-        visitN(instance, 3);
+    it('getting first three pairs', () => {
+        var origPair = wrapper.state('pair');
+        instance.handleSelect(origPair[0]);
+        expect(instance.unvisited.length).toBe(2);
+        expect(instance.winners.length).toBe(1);
+        expect(instance.losers.length).toBe(1);
+
+        origPair = wrapper.state('pair');
+        instance.handleSelect(origPair[0]);
         expect(instance.unvisited.length).toBe(0);
-        expect(instance.visited.length).toBe(6);
+        expect(instance.winners.length).toBe(2);
+        expect(instance.losers.length).toBe(2);
+
+        origPair = wrapper.state('pair');
+        instance.handleSelect(origPair[0]);
+        expect(instance.unvisited.length).toBe(2);
+        expect(instance.winners.length).toBe(0);
+        expect(instance.losers.length).toBe(2);
     });
 
     it('getting new ranks', () => {
@@ -62,12 +73,17 @@ describe('Waffler', () => {
     });
 
     it('getting pairs after first 3', () => {
-        visitN(instance, 3);
+        visitN(instance, wrapper, 3);
+        expect(instance.unvisited.length).toBe(0);
+        expect(instance.winners.length).toBe(2);
+        expect(instance.losers.length).toBe(2);
 
         var origPair = wrapper.state('pair');
-        instance.updatePair();
-        expect(instance.visited.length).toBe(2);
-        expect(instance.unvisited.length).toBe(4);
+        instance.handleSelect(origPair[0]);
+        expect(instance.unvisited.length).toBe(2);
+        expect(instance.winners.length).toBe(0);
+        expect(instance.losers.length).toBe(2);
+
         expect(wrapper.state('pair')[0]).not.toBe(origPair[0]);
         expect(wrapper.state('pair')[1]).not.toBe(origPair[1]);
     });
@@ -80,33 +96,7 @@ describe('Waffler', () => {
 
         instance.selectRestaurant(origPair[0]);
         expect(instance.unvisited.length).toBe(4);
-        expect(instance.visited.length).toBe(2);
         expect(origPair[0].rank).toBeGreaterThan(selectedRank);
         expect(origPair[1].rank).toBeLessThan(otherRank);
-    });
-
-    it('removing restaurants before all visited', () => {
-        var toRemove = wrapper.state('pair')[0];
-        instance.removeRestaurant(toRemove);
-
-        expect(instance.visited.length).toBe(1);
-    });
-
-    it('removing restaurants after all visited', () => {
-        visitN(instance, 3);
-
-        var toRemove = wrapper.state('pair')[0];
-        instance.removeRestaurant(toRemove);
-
-        expect(instance.removed[0].id).toBe(toRemove.id);
-        expect(instance.visited.length).toBe(5);
-    });
-
-    it('removing restaurants multiple times', () => {
-        var toRemove = wrapper.state('pair')[0];
-        instance.removeRestaurant(toRemove);
-        instance.removeRestaurant(toRemove);
-        instance.removeRestaurant(toRemove);
-        expect(instance.removed.length).toBe(1);
     });
 });

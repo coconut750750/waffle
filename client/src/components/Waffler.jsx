@@ -14,17 +14,16 @@ class Waffler extends React.Component {
         };
         this.numRestaurants = 0;
         this.unvisited = [];
-        this.visited = [];
-        this.removed = [];
+        this.winners = [];
+        this.losers = [];
+
         this.numPairPerc = 0.5;
         this.numPairDecay = 2.0 / 3.0;
-        this.curPair = 0;
     }
 
     setInitial(initialData) {
         this.numRestaurants = initialData.length;
         this.unvisited = initialData;
-        this.visited = [];
         this.updatePair();
     }
 
@@ -60,18 +59,16 @@ class Waffler extends React.Component {
         return reducedData;
     }
 
-    handleSelect(e, restaurant) {
+    handleSelect(restaurant) {
         this.selectRestaurant(restaurant);
         this.updatePair();
     }
 
-    selectRestaurant(restaurant, reverse=false) {
+    selectRestaurant(restaurant) {
         var other = this.state.pair[0].id === restaurant.id ? this.state.pair[1] : this.state.pair[0];
-        if (!reverse) {
-            this.setNewRanks(restaurant, other);
-        } else {
-            this.setNewRanks(other, restaurant);
-        }
+        this.winners.push(restaurant);
+        this.losers.push(other);
+        this.setNewRanks(restaurant, other);
     }
 
     setNewRanks(selected, unselected) {
@@ -83,46 +80,38 @@ class Waffler extends React.Component {
 
     updatePair() {
         var pair;
-        if (this.curPair === Math.floor(this.numPairPerc * this.numRestaurants)) {
-            this.unvisited = this.unvisited.concat(this.visited);
-            pair = RestaurantTools.getPair(RestaurantTools.removeFromList(this.unvisited, this.state.pair));
-            this.visited = [];
-            this.numPairPerc = this.numPairPerc * this.numPairDecay;
-            this.curPair = 1;
-            if (Math.floor(this.numPairPerc * this.numRestaurants) === 0) {
-                this.getResults();
+        if (this.unvisited.length <= 0) {
+            if (this.winners.length === 1) {
+                this.displayResults();
                 return;
             }
+            this.numPairPerc = this.numPairPerc * this.numPairDecay;
+            var numRestNeeded = Math.floor(this.numPairPerc * this.numRestaurants) * 2;
+            
+            var neededLosers = numRestNeeded - this.winners.length;
+            var randomLosers = RestaurantTools.getN(this.losers, neededLosers);
+            this.unvisited = this.winners.concat(randomLosers);
+
+            if (this.unvisited.length > 2) {
+                pair = RestaurantTools.getPair(RestaurantTools.removeFromList(this.unvisited, this.state.pair));
+            } else {
+                pair = RestaurantTools.getPair(this.unvisited);
+            }
+
+            this.winners = [];
+            this.losers = RestaurantTools.removeFromList(this.losers, randomLosers);
         } else {
-            this.curPair++;
             pair = RestaurantTools.getPair(this.unvisited);
         }
-        console.log(pair[0].rank + " " + pair[1].rank);
 
         this.unvisited = RestaurantTools.removeFromList(this.unvisited, pair);
-        this.visited = RestaurantTools.addToList(this.visited, pair);
         this.setState({ pair: pair });
     }
 
-    handleRemove(e, restaurant) {
-        e.stopPropagation();
-        this.selectRestaurant(restaurant, true)
-        this.removeRestaurant(restaurant);
-        this.updatePair();
-    }
-
-    removeRestaurant(restaurant) {
-        this.numRestaurants--;
-        this.unvisited = RestaurantTools.removeFromList(Array.from(this.unvisited), [restaurant]);
-        this.visited = RestaurantTools.removeFromList(Array.from(this.visited), [restaurant]);
-        this.removed = RestaurantTools.addToList(this.removed, [restaurant]);
-    }
-
-    getResults() {
+    displayResults() {
         var bestRestaurant = undefined;
-        var allRestaurants = this.visited.concat(this.unvisited);
+        var allRestaurants = this.unvisited.concat(this.winners).concat(this.losers);
         allRestaurants.forEach(function(restaurant) {
-            console.log("final: " + restaurant.rank);
             if (bestRestaurant === undefined || restaurant.rank > bestRestaurant.rank) {
                 bestRestaurant = restaurant;
             }
@@ -141,16 +130,13 @@ class Waffler extends React.Component {
                     <h4>Choose One!</h4>
                 </div>
                 <div className="row justify-content-center">
-                    {
-                        this.state.pair.map(r => (
+                    { this.state.pair.map(r => (
                             <div className="col-6 mb-4">
                                 <RestaurantCard 
                                     restaurant={r} 
-                                    onClick={(e, restaurant) => this.handleSelect(e, restaurant)}
-                                    onRemove={(e, restaurant) => this.handleRemove(e, restaurant)}/>
+                                    onClick={(restaurant) => this.handleSelect(restaurant)}/>
                             </div>
-                        ))
-                    }
+                        )) }
                 </div>
             </div>
         );

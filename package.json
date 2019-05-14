@@ -10,8 +10,8 @@
     "test": "cd client && npm test"
   },
   "dependencies": {
-    "express": "^4.16.2",
-    "yelp-fusion": "^2.0.3"
+    "express": "^4.16.4",
+    "yelp-fusion": "^2.2.1"
   },
   "devDependencies": {
     "concurrently": "^3.5.0"

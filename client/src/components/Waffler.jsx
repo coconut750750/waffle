@@ -87,12 +87,12 @@ class Waffler extends React.Component {
             }
             this.numPairPerc = this.numPairPerc * this.numPairDecay;
             var numRestNeeded = Math.floor(this.numPairPerc * this.numRestaurants) * 2;
-            
+
             var neededLosers = numRestNeeded - this.winners.length;
             var randomLosers = RestaurantTools.getN(this.losers, neededLosers);
             this.unvisited = this.winners.concat(randomLosers);
 
-            if (this.unvisited.length > 2) {
+            if (this.unvisited.length > 3) {
                 pair = RestaurantTools.getPair(RestaurantTools.removeFromList(this.unvisited, this.state.pair));
             } else {
                 pair = RestaurantTools.getPair(this.unvisited);

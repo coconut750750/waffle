@@ -1,6 +1,7 @@
 import React from 'react';
 import Adapter from 'enzyme-adapter-react-16';
 import { shallow, configure } from 'enzyme';
+import "babel-polyfill";
 
 import Waffler from '../Waffler.jsx'
 import Restaurant from '../../restaurant.js'

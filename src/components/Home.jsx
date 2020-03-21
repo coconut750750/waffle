@@ -30,7 +30,7 @@ class Home extends React.Component {
             <div id="home" className="container-fluid back-image">
                 <div className="row justify-content-center mb-4">
                     <div className="col text-center">
-                        <Link to='/'><img style={{width: '30%'}} src="/images/waffle_logo.png" alt="logo"/></Link>
+                        <Link to='/'><img style={{width: '30%'}} src="/static/waffle_logo.png" alt="logo"/></Link>
                     </div>
                 </div>
                 <div className="row justify-content-center">

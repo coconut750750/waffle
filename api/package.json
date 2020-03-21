@@ -1,0 +1,17 @@
+{
+  "name": "api",
+  "version": "1.0.0",
+  "license": "MIT",
+  "scripts": {
+    "start": "nodemon server.js"
+  },
+  "dependencies": {
+    "express": "^4.17.1",
+    "yelp-fusion": "^2.2.1"
+  },
+  "devDependencies": {
+    "nodemon": "^1.18.10",
+    "babel-polyfill": "^6.26.0",
+    "concurrently": "^3.5.0"
+  }
+}

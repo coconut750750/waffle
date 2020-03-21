@@ -37,7 +37,9 @@ class Waffler extends React.Component {
     }
 
     requestApi(query) {
+        console.log("requesting");
         this.callApi(query).then(res => {
+            console.log("done");
             var restData = this.transformData(res.data);
             this.setInitial(restData);
             }).catch(err => console.log(err));

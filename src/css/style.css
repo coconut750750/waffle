@@ -5,7 +5,7 @@ body {
 }
 
 .back-image {
-    background-image: url('/static/waffle_back.png');
+    background-image: url('/images/waffle_back.png');
     background-attachment: fixed;
     background-size: cover;
 }

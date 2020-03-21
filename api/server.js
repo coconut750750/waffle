@@ -4,13 +4,13 @@ Source: https://medium.freecodecamp.org/how-to-make-create-react-app-work-with-a
 
 const express = require('express');
 const path = require('path');
+const yelp = require('yelp-fusion');
 
 const app = express();
 const port = process.env.PORT || 5000;
 
 // API Calls
 app.get('/api/yelp', (req, res) => {
-    const yelp = require('yelp-fusion');
 
     var yelp_query;
     if (req.query.city) {
@@ -44,6 +44,10 @@ if (process.env.NODE_ENV === 'production') {
     app.get('*', function(req, res) {
     res.sendFile(path.join(__dirname, 'client/build', 'index.html'));
     });
+}
+
+if (process.env.NODE_ENV === 'dev') {
+    require('dotenv').config(); 
 }
 
 app.listen(port, () => console.log(`Listening on port ${port}`));

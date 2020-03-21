@@ -12,6 +12,7 @@
   "devDependencies": {
     "nodemon": "^1.18.10",
     "babel-polyfill": "^6.26.0",
-    "concurrently": "^3.5.0"
+    "concurrently": "^3.5.0",
+    "dotenv": "^8.2.0"
   }
 }

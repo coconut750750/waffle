@@ -129,7 +129,7 @@ class Waffler extends React.Component {
         return (
             <div id="waffler" className="container-fluid">
                 <div className="row justify-content-center mb-4">
-                    <h4>Choose One!</h4>
+                    <h4>Choose One</h4>
                 </div>
                 <div className="row justify-content-center">
                     { this.state.pair.map(r => (
